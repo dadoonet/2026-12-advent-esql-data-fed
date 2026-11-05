@@ -1,0 +1,42 @@
+# Kibana Dev Tools: run after ./demo.sh setup.
+# No private credentials are included in this file.
+
+GET /_query/data_source/santa_minio
+
+GET /_query/dataset/santa_deliveries_2025
+
+# 01-inspect
+POST /_query
+{
+  "query": """
+FROM santa_deliveries_2025
+| KEEP delivery_id, country, gift_category, carrier, promised_at, delivered_at, delay_minutes
+| SORT delivery_id ASC
+| LIMIT 5
+"""
+}
+
+# 02-categories
+POST /_query
+{
+  "query": """
+FROM santa_deliveries_2025
+| STATS total = COUNT(*), late = COUNT(*) WHERE delay_minutes > 0 BY gift_category
+| EVAL late_rate = 100.0 * late / total
+| SORT late_rate DESC, gift_category ASC
+| LIMIT 10
+"""
+}
+
+# 03-investigate
+POST /_query
+{
+  "query": """
+FROM santa_deliveries_2025
+| WHERE gift_category == "toy_train"
+| STATS total = COUNT(*), late = COUNT(*) WHERE delay_minutes > 0 BY carrier, country
+| EVAL late_rate = 100.0 * late / total
+| SORT late_rate DESC, carrier ASC, country ASC
+| LIMIT 10
+"""
+}

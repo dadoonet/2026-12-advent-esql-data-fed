@@ -1,0 +1,249 @@
+[
+  {
+    "command": "./demo.sh ",
+    "environment": {},
+    "outcome": "PASS",
+    "detail": "exit 0"
+  },
+  {
+    "command": "./demo.sh setup",
+    "environment": {},
+    "outcome": "PASS",
+    "detail": "exit 0"
+  },
+  {
+    "command": "./demo.sh run",
+    "environment": {},
+    "outcome": "PASS",
+    "detail": "exit 0"
+  },
+  {
+    "command": "./demo.sh status",
+    "environment": {},
+    "outcome": "PASS",
+    "detail": "exit 0"
+  },
+  {
+    "command": "./demo.sh setup --skip-stack-start",
+    "environment": {},
+    "outcome": "PASS",
+    "detail": "exit 0"
+  },
+  {
+    "command": "./demo.sh setup --skip-s3-start",
+    "environment": {},
+    "outcome": "PASS",
+    "detail": "exit 0"
+  },
+  {
+    "command": "./demo.sh setup --skip-data-upload",
+    "environment": {},
+    "outcome": "PASS",
+    "detail": "exit 0"
+  },
+  {
+    "command": "./demo.sh setup --skip-registration",
+    "environment": {},
+    "outcome": "PASS",
+    "detail": "exit 0"
+  },
+  {
+    "command": "./demo.sh --skip-stack-start --skip-s3-start --skip-data-upload --skip-registration",
+    "environment": {},
+    "outcome": "PASS",
+    "detail": "exit 0"
+  },
+  {
+    "command": "./demo.sh setup --skip-stack-start --skip-s3-start --skip-data-upload --skip-registration",
+    "environment": {
+      "S3_URL": "http://localhost:19999",
+      "READY_TIMEOUT": "3"
+    },
+    "outcome": "EXPECTED_FAILURE",
+    "detail": "not ready after 3s"
+  },
+  {
+    "command": "./demo.sh setup --skip-stack-start --skip-s3-start --skip-data-upload --skip-registration",
+    "environment": {
+      "ES_URL": "http://localhost:19999",
+      "READY_TIMEOUT": "3"
+    },
+    "outcome": "EXPECTED_FAILURE",
+    "detail": "not ready after 3s"
+  },
+  {
+    "command": "./demo.sh setup --skip-stack-start --skip-s3-start --skip-data-upload --skip-registration",
+    "environment": {
+      "KIBANA_URL": "http://localhost:19999",
+      "READY_TIMEOUT": "3"
+    },
+    "outcome": "EXPECTED_FAILURE",
+    "detail": "not ready after 3s"
+  },
+  {
+    "command": "./demo.sh setup --skip-stack-start --skip-s3-start --skip-data-upload --skip-registration",
+    "environment": {},
+    "outcome": "EXPECTED_FAILURE",
+    "detail": "Required Parquet object missing"
+  },
+  {
+    "command": "./demo.sh setup --skip-stack-start --skip-s3-start",
+    "environment": {},
+    "outcome": "PASS",
+    "detail": "exit 0"
+  },
+  {
+    "command": "./demo.sh setup --skip-stack-start --skip-s3-start --skip-data-upload --skip-registration",
+    "environment": {},
+    "outcome": "EXPECTED_FAILURE",
+    "detail": "Required dataset santa_deliveries_2025 missing"
+  },
+  {
+    "command": "./demo.sh setup --skip-stack-start --skip-s3-start --skip-data-upload",
+    "environment": {},
+    "outcome": "PASS",
+    "detail": "exit 0"
+  },
+  {
+    "command": "./demo.sh setup --skip-stack-start --skip-s3-start --skip-data-upload --skip-registration",
+    "environment": {},
+    "outcome": "EXPECTED_FAILURE",
+    "detail": "Required data_source santa_minio missing"
+  },
+  {
+    "command": "./demo.sh setup --skip-stack-start --skip-s3-start --skip-data-upload",
+    "environment": {},
+    "outcome": "PASS",
+    "detail": "exit 0"
+  },
+  {
+    "command": "./demo.sh setup --skip-stack-start --skip-s3-start --skip-data-upload --skip-registration",
+    "environment": {},
+    "outcome": "EXPECTED_FAILURE",
+    "detail": "incompatible resource"
+  },
+  {
+    "command": "./demo.sh down",
+    "environment": {},
+    "outcome": "PASS",
+    "detail": "exit 0"
+  },
+  {
+    "command": "./demo.sh run",
+    "environment": {},
+    "outcome": "EXPECTED_FAILURE",
+    "detail": "service unavailable"
+  },
+  {
+    "command": "./demo.sh setup --skip-data-upload --skip-registration",
+    "environment": {},
+    "outcome": "PASS",
+    "detail": "exit 0"
+  },
+  {
+    "command": "./demo.sh run",
+    "environment": {},
+    "outcome": "PASS",
+    "detail": "exit 0"
+  },
+  {
+    "command": "./demo.sh setup --skip-stack-start --skip-s3-start --skip-data-upload --skip-registration",
+    "environment": {},
+    "outcome": "EXPECTED_FAILURE",
+    "detail": "Refusing to overwrite"
+  },
+  {
+    "command": "./demo.sh setup --skip-stack-start --skip-s3-start --skip-data-upload --skip-registration",
+    "environment": {},
+    "outcome": "EXPECTED_FAILURE",
+    "detail": "Refusing to overwrite"
+  },
+  {
+    "command": "./demo.sh setup --skip-data-upload --skip-registration",
+    "environment": {
+      "READY_TIMEOUT": "180"
+    },
+    "outcome": "PASS",
+    "detail": "exit 0"
+  },
+  {
+    "command": "./demo.sh setup",
+    "environment": {
+      "DOCKER_HOST": "unix:///tmp/advent-nonexistent-docker.sock"
+    },
+    "outcome": "EXPECTED_FAILURE",
+    "detail": "Docker and Docker Compose"
+  },
+  {
+    "command": "./demo.sh reset",
+    "environment": {},
+    "outcome": "EXPECTED_FAILURE",
+    "detail": "Reset cancelled"
+  },
+  {
+    "command": "./demo.sh setup --skip-stack-start --skip-s3-start --skip-registration",
+    "environment": {
+      "S3_URL": "http://localhost:19000"
+    },
+    "outcome": "PASS",
+    "detail": "exit 0"
+  },
+  {
+    "command": "./demo.sh down",
+    "environment": {},
+    "outcome": "PASS",
+    "detail": "exit 0"
+  },
+  {
+    "command": "./demo.sh reset --yes",
+    "environment": {},
+    "outcome": "PASS",
+    "detail": "exit 0"
+  },
+  {
+    "command": "verify external S3 container and uploaded object after down/reset",
+    "outcome": "PASS"
+  },
+  {
+    "command": "./demo.sh setup",
+    "environment": {},
+    "outcome": "EXPECTED_FAILURE",
+    "detail": "reserved Compose resources belong to another"
+  },
+  {
+    "command": "./demo.sh reset --yes",
+    "environment": {},
+    "outcome": "EXPECTED_FAILURE",
+    "detail": "reserved Compose resources belong to another"
+  },
+  {
+    "command": "./demo.sh setup",
+    "environment": {},
+    "outcome": "EXPECTED_FAILURE",
+    "detail": "reserved Compose resources belong to another"
+  },
+  {
+    "command": "./demo.sh reset --yes",
+    "environment": {},
+    "outcome": "EXPECTED_FAILURE",
+    "detail": "reserved Compose resources belong to another"
+  },
+  {
+    "command": "./demo.sh ",
+    "environment": {},
+    "outcome": "PASS",
+    "detail": "exit 0"
+  },
+  {
+    "command": "./demo.sh run",
+    "environment": {},
+    "outcome": "PASS",
+    "detail": "exit 0"
+  },
+  {
+    "command": "./demo.sh status",
+    "environment": {},
+    "outcome": "PASS",
+    "detail": "exit 0"
+  }
+]
