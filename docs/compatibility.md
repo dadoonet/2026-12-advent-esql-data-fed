@@ -79,7 +79,15 @@ Setup now writes `cluster.state.encryption.active_password_id` with value `santa
 
 ## Query execution observation
 
-`./demo.sh run` successfully executed all three external-dataset queries and matched their independent expectations on the observed build. Initial aggregate queries returned the warning `No limit defined, adding default limit of [1000]`; explicit `LIMIT 10` clauses avoid that warning. The complete default-command and lifecycle matrix is recorded separately in [validation.md](validation.md).
+The original three external-dataset queries successfully matched their independent expectations on the observed build. Initial aggregate queries returned the warning `No limit defined, adding default limit of [1000]`; explicit `LIMIT 10` clauses avoid that warning.
+
+The extension also executed two queries successfully: one aggregates only the indexed 2026 plans, and the other performs a genuine multi-key `LOOKUP JOIN` from the external 2025 dataset to the `index.mode: lookup` index `santa_delivery_plan_2026`. The keys are `gift_category`, `carrier`, and `country`. The join returned all six toy-train routes and matched independently generated expectations, including 192 illustrative late deliveries for the deliberately problematic route. The historical Parquet records remain external; only new synthetic 2026 planning data is indexed.
+
+Kibana's `PUT /api/dashboards/santa-esql-past-and-plan` API created a native five-panel dashboard. GET verification and compatible reuse passed. A browser check then rendered both source bar charts and the mixed-source table with the expected six rows and the 192 scenario value; no page errors or HTTP responses of 400 or above were observed. The stable dashboard ID and managed content are checked before reuse; existing foreign or changed definitions are not overwritten. See [dashboard.md](dashboard.md) for the query and lifecycle details.
+
+During index creation, the Docker filesystem reached about 90.1% usage: approximately 10 GB free, below the default high-watermark reserve of roughly 10.2 GB. The shard could not allocate and index creation timed out. The local node configuration now uses explicit free-space allocation thresholds of low `3gb`, high `2gb`, and flood stage `1gb`; disk safeguards remain enabled, and host Docker settings are unchanged. Earlier persistent configurations require an explicit owned-data reset because their recorded configuration fingerprint differs.
+
+The complete default-command and lifecycle matrix is recorded separately in [validation.md](validation.md).
 
 ## Why Compose instead of start-local
 

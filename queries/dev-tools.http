@@ -1,9 +1,12 @@
 # Kibana Dev Tools: run after ./demo.sh setup.
 # No private credentials are included in this file.
+# Historical data remains external; only the synthetic 2026 plan is indexed.
 
 GET /_query/data_source/santa_minio
 
 GET /_query/dataset/santa_deliveries_2025
+
+GET /santa_delivery_plan_2026/_mapping
 
 # 01-inspect
 POST /_query
@@ -37,6 +40,32 @@ FROM santa_deliveries_2025
 | STATS total = COUNT(*), late = COUNT(*) WHERE delay_minutes > 0 BY carrier, country
 | EVAL late_rate = 100.0 * late / total
 | SORT late_rate DESC, carrier ASC, country ASC
+| LIMIT 10
+"""
+}
+
+# 04-planned-volumes
+POST /_query
+{
+  "query": """
+FROM santa_delivery_plan_2026
+| STATS planned_deliveries = SUM(planned_deliveries) BY gift_category
+| SORT planned_deliveries DESC, gift_category ASC
+| LIMIT 10
+"""
+}
+
+# 05-archive-plan-join
+POST /_query
+{
+  "query": """
+FROM santa_deliveries_2025
+| WHERE gift_category == "toy_train"
+| STATS historical_total = COUNT(*), historical_late = COUNT(*) WHERE delay_minutes > 0 BY gift_category, carrier, country
+| LOOKUP JOIN santa_delivery_plan_2026 ON gift_category, carrier, country
+| EVAL historical_late_rate = 100.0 * historical_late / historical_total, illustrative_late_deliveries = 1.0 * planned_deliveries * historical_late / historical_total
+| KEEP carrier, country, historical_total, historical_late, historical_late_rate, planned_deliveries, target_late_rate, illustrative_late_deliveries
+| SORT historical_late_rate DESC, carrier ASC, country ASC
 | LIMIT 10
 """
 }

@@ -1,5 +1,8 @@
 # Validation record
 
+This record includes the original three-query archive baseline and the subsequent
+five-query indexed-plan/dashboard extension. The final extension results appear below.
+
 Test date: **2026-11-05**, Europe/Paris. Host: macOS ARM64 (Apple Silicon),
 Docker engine Linux `aarch64`, approximately 16 GiB Docker memory.
 Python `3.14.8`; Docker client `29.8.2`, server `29.9.2`; Compose `v5.6.1`.
@@ -122,8 +125,67 @@ that interruption.
 
 ## Untested paths
 
-Not tested: AMD64 execution, final 9.6 release, other snapshot builds, a real
-Kibana browser interaction (the API returned ready), TLS/custom CA endpoints,
+Not tested: AMD64 execution, final 9.6 release, other snapshot builds, TLS/custom CA endpoints,
 AWS access, managed/federated identity, trial activation on an existing Basic
 cluster, an exhausted trial, remote externally managed Elasticsearch, production
 scale, and long-running operation. No AWS or paid resources were accessed.
+
+## Indexed plans and dashboard extension — 2026-11-05
+
+The same Elastic image tags/digests and MinIO source image above were reused.
+The extension was validated after `./demo.sh reset --yes`, starting with empty
+owned Elasticsearch, Kibana, and MinIO volumes; images and the existing Python
+virtual environment were retained. Plain `./demo.sh` successfully prepared both
+sources and the dashboard, then validated all **five** queries.
+
+Additional verified results:
+
+- Exactly 18 new synthetic 2026 plan documents in lookup index
+  `santa_delivery_plan_2026`; the 2025 archive remains external.
+- Elasticsearch-only volume totals: toy trains 740, books 600, plush 600;
+  total planned deliveries 1,940.
+- A real three-key `LOOKUP JOIN` after aggregation of the external dataset
+  returned six toy-train routes. Polar Parcel / France combined 16/20 historical
+  late deliveries with 240 planned deliveries, producing 192 illustrative late
+  deliveries at the unchanged historical rate. Other routes produced 10 each.
+- The right-hand lookup target is an Elasticsearch index; the left-hand source
+  is the external Parquet dataset. A dataset as the lookup target was not used.
+- `PUT /api/dashboards/santa-esql-past-and-plan` created the native dashboard;
+  `GET` and subsequent setup verified the same ID without duplicates. The
+  implementation uses the Dashboards API, with `kbn-xsrf`, rather than raw
+  Saved Objects APIs. A generated-ID POST path was not used.
+- Chrome headless rendered both bar charts and the six-row mixed table.
+  The screenshot was visually inspected. Page errors and HTTP responses >=400
+  were both empty. Login credentials were loaded in memory; browser state and
+  screenshots remain local and uncommitted.
+
+Commands passed: default setup+run, repeated `setup`, `run`, `status`, individual
+`--skip-indexed-data` and `--skip-dashboard`, all six skip options together,
+`down`, and restart using all four resource-reuse skips. Missing index/dashboard,
+foreign dashboard ownership, dashboard content drift, and changed plan documents
+failed as expected and were preserved until explicitly restored by the test.
+See [extension command outcomes](dashboard-validation.json).
+
+Final targeted controls reject added dashboard queries, global filters, pinned
+controls, changed sampling, timed-out lookup searches, and failed search shards.
+The dashboard accepts only the exact recorded server defaults and generated
+panel IDs. The complete default command passed again after these controls were
+added. Existing syntax, query-copy, and publication-secret audits were repeated.
+
+### Disk allocation issue diagnosed
+
+The first lookup-index creation timed out with its primary shard unassigned.
+`/_cluster/allocation/explain` reported `disk_threshold: NO`: the Docker volume
+had about 10 GiB free (90.1% used), below the default high watermark's required
+10.2 GiB. The owned demo now has explicit free-space reserves in
+`config/elasticsearch.yml`: low 3 GiB, high 2 GiB, flood-stage 1 GiB. Disk
+allocation/write safeguards remain enabled. No Docker Desktop policy or disk
+size was changed and no unrelated images/volumes were pruned. Cold startup and
+index creation succeeded with this configuration.
+
+The earlier three-query results remain valid; the new index/dashboard are
+additional resources. The original browser-test exclusion above is superseded
+by this extension's actual rendering check. Still untested: other builds,
+AMD64 execution, final 9.6 release, production scale, and external managed
+Elasticsearch/TLS configurations. The 192 figure is an illustrative scenario,
+not a forecast.

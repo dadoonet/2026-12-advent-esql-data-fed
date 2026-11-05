@@ -1,0 +1,117 @@
+[
+  {
+    "command": "./demo.sh reset --yes",
+    "outcome": "PASS",
+    "detail": "exit 0"
+  },
+  {
+    "command": "./demo.sh ",
+    "outcome": "PASS",
+    "detail": "exit 0"
+  },
+  {
+    "command": "./demo.sh setup",
+    "outcome": "PASS",
+    "detail": "exit 0"
+  },
+  {
+    "command": "./demo.sh run",
+    "outcome": "PASS",
+    "detail": "exit 0"
+  },
+  {
+    "command": "./demo.sh status",
+    "outcome": "PASS",
+    "detail": "exit 0"
+  },
+  {
+    "command": "./demo.sh setup --skip-indexed-data",
+    "outcome": "PASS",
+    "detail": "exit 0"
+  },
+  {
+    "command": "./demo.sh setup --skip-dashboard",
+    "outcome": "PASS",
+    "detail": "exit 0"
+  },
+  {
+    "command": "./demo.sh --skip-stack-start --skip-s3-start --skip-data-upload --skip-registration --skip-indexed-data --skip-dashboard",
+    "outcome": "PASS",
+    "detail": "exit 0"
+  },
+  {
+    "command": "./demo.sh setup --skip-stack-start --skip-s3-start --skip-data-upload --skip-registration --skip-indexed-data --skip-dashboard",
+    "outcome": "EXPECTED_FAILURE",
+    "detail": "Required dashboard missing"
+  },
+  {
+    "command": "./demo.sh setup --skip-stack-start --skip-s3-start --skip-data-upload --skip-registration --skip-indexed-data",
+    "outcome": "PASS",
+    "detail": "exit 0"
+  },
+  {
+    "command": "./demo.sh setup --skip-stack-start --skip-s3-start --skip-data-upload --skip-registration --skip-indexed-data --skip-dashboard",
+    "outcome": "EXPECTED_FAILURE",
+    "detail": "no demo ownership marker"
+  },
+  {
+    "command": "./demo.sh setup --skip-stack-start --skip-s3-start --skip-data-upload --skip-registration --skip-indexed-data --skip-dashboard",
+    "outcome": "EXPECTED_FAILURE",
+    "detail": "dashboard is incompatible"
+  },
+  {
+    "command": "./demo.sh setup --skip-stack-start --skip-s3-start --skip-data-upload --skip-registration --skip-indexed-data --skip-dashboard",
+    "outcome": "EXPECTED_FAILURE",
+    "detail": "Required lookup index"
+  },
+  {
+    "command": "./demo.sh setup --skip-stack-start --skip-s3-start --skip-data-upload --skip-registration --skip-dashboard",
+    "outcome": "PASS",
+    "detail": "exit 0"
+  },
+  {
+    "command": "./demo.sh setup --skip-stack-start --skip-s3-start --skip-data-upload --skip-registration --skip-indexed-data --skip-dashboard",
+    "outcome": "EXPECTED_FAILURE",
+    "detail": "incompatible documents"
+  },
+  {
+    "command": "./demo.sh down",
+    "outcome": "PASS",
+    "detail": "exit 0"
+  },
+  {
+    "command": "./demo.sh setup --skip-data-upload --skip-registration --skip-indexed-data --skip-dashboard",
+    "outcome": "PASS",
+    "detail": "exit 0"
+  },
+  {
+    "command": "./demo.sh run",
+    "outcome": "PASS",
+    "detail": "exit 0"
+  },
+  {
+    "command": "./demo.sh status",
+    "outcome": "PASS",
+    "detail": "exit 0"
+  },
+  {
+    "command": "targeted dashboard comparison controls",
+    "outcome": "PASS",
+    "detail": "Reject added queries, filters, pinned controls and changed sampling"
+  },
+  {
+    "command": "targeted lookup search controls",
+    "outcome": "PASS",
+    "detail": "Reject timed-out searches and failed shards"
+  },
+  {
+    "command": "./demo.sh after final verification guards",
+    "outcome": "PASS",
+    "detail": "All five queries matched independent expectations"
+  },
+  {
+    "command": "Chrome dashboard render",
+    "outcome": "PASS",
+    "detail": "Two bar charts and six-row joined table; no page or HTTP errors"
+  }
+]
