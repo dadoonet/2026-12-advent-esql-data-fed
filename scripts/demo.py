@@ -30,7 +30,7 @@ DEFAULTS = {
     'READY_TIMEOUT': '240',
 }
 SECRETS = ('ES_PASSWORD', 'KIBANA_PASSWORD', 'KIBANA_ENCRYPTION_KEY',
-           'S3_ACCESS_KEY', 'S3_SECRET_KEY')
+           'S3_ACCESS_KEY', 'S3_SECRET_KEY', 'CLUSTER_ENCRYPTION_PASSWORD')
 
 
 def log(stage, message):
@@ -88,9 +88,9 @@ def scrub(cfg, message):
     return message
 
 
-def command(cfg, args, capture=False):
+def command(cfg, args, capture=False, input_text=None):
     result = subprocess.run(args, cwd=ROOT, env={**os.environ, **cfg},
-                            text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                            text=True, input=input_text, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     if result.returncode:
         fail(scrub(cfg, f'Command failed: {args[0]} {args[1]}\n{result.stderr.strip()}'))
     if not capture and result.stdout.strip():
@@ -106,25 +106,34 @@ def docker_ready(cfg):
         fail('Docker and Docker Compose must be installed and the Docker daemon accessible. Start Docker yourself, then retry.')
 
 
-def compose(cfg, *args):
+def compose(cfg, *args, input_text=None):
     return command(cfg, ['docker', 'compose', '--project-name', PROJECT,
-                         '--file', str(ROOT / 'compose.yaml'), *args], capture=True)
+                         '--file', str(ROOT / 'compose.yaml'), *args], capture=True, input_text=input_text)
 
 
 def owned_resources(cfg):
     """Refuse name collisions before any Compose mutation, including cleanup."""
-    for kind, listing, inspecting in [
-        ('container', ['ps', '-aq'], ['inspect']),
-        ('volume', ['volume', 'ls', '-q'], ['volume', 'inspect']),
-        ('network', ['network', 'ls', '-q'], ['network', 'inspect']),
-    ]:
+    # Check exact reserved names too: Compose may otherwise adopt an unlabelled volume.
+    specifications = [
+        ('container', ['ps', '-aq'], ['inspect'],
+         [f'{PROJECT}-{service}-1' for service in ('elasticsearch', 'kibana', 'minio')]),
+        ('volume', ['volume', 'ls', '-q'], ['volume', 'inspect'],
+         [f'{PROJECT}_{volume}' for volume in ('es-data', 'es-config', 'kibana-data', 'minio-data')]),
+        ('network', ['network', 'ls', '-q'], ['network', 'inspect'], [f'{PROJECT}_default']),
+    ]
+    for kind, listing, inspecting, reserved in specifications:
         ids = command(cfg, ['docker', *listing, '--filter', f'label=com.docker.compose.project={PROJECT}'], True).split()
+        if kind == 'container':
+            all_names = command(cfg, ['docker', 'ps', '-a', '--format', '{{.Names}}'], True).split()
+        else:
+            all_names = command(cfg, ['docker', *listing], True).split()
+        ids = sorted(set(ids) | (set(reserved) & set(all_names)))
         if ids:
             entries = json.loads(command(cfg, ['docker', *inspecting, *ids], True))
             for entry in entries:
                 labels = entry.get('Config', {}).get('Labels', {}) if kind == 'container' else entry.get('Labels', {})
                 if labels.get('io.santa.advent.owner') != OWNER:
-                    fail(f'Refusing to modify {kind}: Compose project {PROJECT} belongs to another directory or owner.')
+                    fail(f'Refusing to modify {kind}: reserved Compose resources belong to another directory or owner.')
 
 
 def request(cfg, method, path, payload=None, missing_ok=False, kibana=False):
@@ -136,7 +145,7 @@ def request(cfg, method, path, payload=None, missing_ok=False, kibana=False):
     try:
         with urllib.request.urlopen(req, timeout=30) as response:
             if response.headers.get('Warning'):
-                fail('Elasticsearch returned a Warning header; inspect this build before continuing.')
+                fail(scrub(cfg, 'Elasticsearch Warning: ' + response.headers.get('Warning')))
             return json.load(response)
     except urllib.error.HTTPError as exc:
         if exc.code == 404 and missing_ok:
@@ -149,16 +158,17 @@ def request(cfg, method, path, payload=None, missing_ok=False, kibana=False):
 
 def wait(cfg, name, check):
     deadline = time.monotonic() + float(cfg['READY_TIMEOUT'])
+    last_error = 'service reported not ready'
     while True:
         try:
             result = check()
             if result:
                 log('ready', name)
                 return result
-        except (RuntimeError, OSError):
-            pass
+        except (RuntimeError, OSError) as exc:
+            last_error = scrub(cfg, str(exc))
         if time.monotonic() >= deadline:
-            fail(f'{name} not ready after {cfg["READY_TIMEOUT"]}s. Check ./demo.sh status and project container logs; verify endpoint and credentials.')
+            fail(f'{name} not ready after {cfg["READY_TIMEOUT"]}s. Check ./demo.sh status and project container logs; verify endpoint and credentials. Last error: {last_error}')
         time.sleep(2)
 
 
@@ -263,9 +273,11 @@ def ensure_license(cfg):
 
 def record_config(cfg):
     STATE.mkdir(exist_ok=True, mode=0o700)
-    keys = sorted(set(DEFAULTS) | set(SECRETS) | {'MINIO_IMAGE', 'ES_JAVA_OPTS'})
+    keys = sorted((set(DEFAULTS) | set(SECRETS) | {'ES_JAVA_OPTS'}) - {'READY_TIMEOUT'})
     # Compare fingerprints, never store a second copy of credentials.
-    fingerprint = hashlib.sha256(json.dumps({k: cfg.get(k) for k in keys}, sort_keys=True).encode()).hexdigest()
+    settings = {k: cfg.get(k) for k in keys}
+    settings['files'] = {p: hashlib.sha256((ROOT / p).read_bytes()).hexdigest() for p in ('compose.yaml', 'config/elasticsearch.yml', 'config/kibana.yml', 'config/Dockerfile.minio')}
+    fingerprint = hashlib.sha256(json.dumps(settings, sort_keys=True).encode()).hexdigest()
     path = STATE / 'stack.sha256'
     if path.exists() and path.read_text() != fingerprint:
         fail('Local stack configuration changed. Restore .env or explicitly reset owned persistent data before changing versions, ports, or credentials.')
@@ -285,12 +297,23 @@ def setup(cfg, args):
         log('skip', 'Checking existing S3 service')
     wait(cfg, 'S3 authentication', lambda: s3_ready(cfg))
     if not args.skip_stack_start:
+        log('keystore', 'Preparing persistent cluster-state encryption keys')
+        script = ('if [ ! -f config/elasticsearch.keystore ]; then bin/elasticsearch-keystore create; fi; '
+                  'bin/elasticsearch-keystore add --stdin --force cluster.state.encryption.active_password_id')
+        compose(cfg, 'run', '--rm', '--no-deps', '-T', '--entrypoint', 'bash', 'elasticsearch',
+                '-c', script, input_text='santa-demo\n')
+        compose(cfg, 'run', '--rm', '--no-deps', '-T', '--entrypoint',
+                '/usr/share/elasticsearch/bin/elasticsearch-keystore', 'elasticsearch',
+                'add', '--stdin', '--force', 'cluster.state.encryption.password.santa-demo',
+                input_text=cfg['CLUSTER_ENCRYPTION_PASSWORD'] + '\n')
         log('start', 'Starting owned Elasticsearch')
         compose(cfg, 'up', '-d', 'elasticsearch')
     else:
         log('skip', 'Checking existing Elasticsearch and Kibana')
     info = wait(cfg, 'Elasticsearch', lambda: es_ready(cfg))
     log('build', f"Elasticsearch {info['version']['number']} build {info['version']['build_hash']}")
+    if not args.skip_stack_start:
+        request(cfg, 'POST', '/_nodes/reload_secure_settings', {})
     ensure_license(cfg)
     if not args.skip_stack_start:
         request(cfg, 'POST', '/_security/user/kibana_system/_password', {'password': cfg['KIBANA_PASSWORD']})
@@ -314,7 +337,8 @@ def run(cfg):
     expected = json.loads((ROOT / 'data/expected.json').read_text())
     STATE.mkdir(exist_ok=True, mode=0o700)
     # An index with this name would invalidate the external-data demonstration.
-    if request(cfg, 'GET', f'/_resolve/index/{DATASET}')['indices']:
+    resolved = request(cfg, 'GET', f'/_resolve/index/{DATASET}', missing_ok=True) or {}
+    if any(resolved.get(kind) for kind in ('indices', 'aliases', 'data_streams')):
         fail('An index shadows the dataset name. Remove the naming conflict before this external-data experiment.')
     for query in sorted((ROOT / 'queries').glob('*.esql')):
         response = request(cfg, 'POST', '/_query', {'query': query.read_text(), 'locale': 'en-US'})
@@ -360,8 +384,8 @@ def cleanup(cfg, reset=False, yes=False):
 
 
 def main():
-    parser = argparse.ArgumentParser(description=__doc__, epilog='Examples: ./demo.sh; ./demo.sh setup; ./demo.sh run; ./demo.sh setup --skip-stack-start --skip-s3-start --skip-data-upload --skip-registration; ./demo.sh reset --yes')
-    parser.add_argument('command', nargs='?', default='all', choices=['all', 'setup', 'run', 'status', 'down', 'reset', 'help'])
+    parser = argparse.ArgumentParser(prog='./demo.sh', description=__doc__, epilog='Examples: ./demo.sh; ./demo.sh setup; ./demo.sh run; ./demo.sh setup --skip-stack-start --skip-s3-start --skip-data-upload --skip-registration; ./demo.sh reset --yes')
+    parser.add_argument('command', nargs='?', default='all', choices=['all', 'setup', 'run', 'status', 'down', 'reset', 'help'], help='default/all: setup then run; setup: prepare and start; run: query and validate; status: check readiness and data; down: stop, preserving volumes; reset: delete owned volumes; help: show usage')
     for flag, description in [
         ('stack-start', 'Reuse configured Elasticsearch and Kibana; check readiness'),
         ('s3-start', 'Reuse configured S3 endpoint; check authentication'),
