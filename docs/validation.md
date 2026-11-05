@@ -200,3 +200,25 @@ nested PyArrow requirements, so an existing virtual environment is updated when
 any pin changes. The complete default command passed with the corrected version.
 A new temporary MinIO object was also uploaded, read back byte-for-byte, and
 deleted successfully; the committed archive object was preserved.
+
+## Header image — 2026-11-05
+
+The supplied PNG `assets/santa-elky-christmas-past.png` was added unchanged as a
+native image panel above the introduction. Original dimensions: 2172 × 724;
+SHA-256: `1253d48bdc6d4ec08e65a905f28ec591bcad9a86cd5fab40741b7fe8fc88ed96`.
+
+Authenticated Kibana Files API creation, binary upload, metadata retrieval, and
+byte-for-byte download verification passed on the same recorded Kibana build.
+The exact previous five-panel dashboard was upgraded to six panels after a full
+compatibility check. Repeated verification reused the image file ID; setup with
+all six skip flags and status both passed. Browser checks confirmed the image's
+original natural dimensions, preserved aspect ratio, and the existing charts and
+joined data, with no page or HTTP errors. The screenshot was visually inspected.
+
+The internal Files API requires `x-elastic-internal-origin` in this snapshot;
+the header is supplied only to Files requests. No Kibana configuration or security
+policy was changed. Public Dashboard API requests still manage the dashboard.
+The committed template contains a runtime file-ID placeholder; no environment's
+actual file ID is committed. Image Files API compatibility must be retested for
+other Kibana builds. A new full reset/down cycle was not repeated for this visual
+change; the previous lifecycle results remain recorded above.

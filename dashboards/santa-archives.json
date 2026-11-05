@@ -3,10 +3,31 @@
   "description": "Managed by santa-esql-advent: past-and-plan-v1. Compare external Christmas 2025 archives with the indexed 2026 delivery plan.",
   "panels": [
     {
-      "type": "markdown",
+      "type": "image",
       "grid": {
         "x": 0,
         "y": 0,
+        "w": 48,
+        "h": 16
+      },
+      "config": {
+        "hide_title": true,
+        "hide_border": true,
+        "image_config": {
+          "alt_text": "Elky dressed as Santa meeting the Ghost of Christmas Past with a toy train.",
+          "object_fit": "contain",
+          "src": {
+            "type": "file",
+            "file_id": "__SANTA_HEADER_IMAGE_FILE_ID__"
+          }
+        }
+      }
+    },
+    {
+      "type": "markdown",
+      "grid": {
+        "x": 0,
+        "y": 16,
         "w": 48,
         "h": 5
       },
@@ -18,7 +39,7 @@
       "type": "vis",
       "grid": {
         "x": 0,
-        "y": 5,
+        "y": 21,
         "w": 24,
         "h": 12
       },
@@ -48,7 +69,7 @@
       "type": "vis",
       "grid": {
         "x": 24,
-        "y": 5,
+        "y": 21,
         "w": 24,
         "h": 12
       },
@@ -78,7 +99,7 @@
       "type": "vis",
       "grid": {
         "x": 0,
-        "y": 17,
+        "y": 33,
         "w": 48,
         "h": 13
       },
@@ -131,7 +152,7 @@
       "type": "markdown",
       "grid": {
         "x": 0,
-        "y": 30,
+        "y": 46,
         "w": 48,
         "h": 4
       },

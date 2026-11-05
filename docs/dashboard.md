@@ -9,13 +9,14 @@ Setup creates or verifies the dashboard. Open the URL printed by `./demo.sh setu
 
 ## Panels and query families
 
-The committed [dashboard definition](../dashboards/santa-archives.json) contains five native Kibana panels:
+The committed [dashboard definition](../dashboards/santa-archives.json) contains six native Kibana panels:
 
-1. A Markdown introduction identifies the two sources and the late-delivery rule.
-2. **[Elasticsearch] 2026 planned deliveries:** a bar chart querying only the indexed plan.
-3. **[S3] 2025 late-delivery rate (%):** a bar chart querying only the external archive.
-4. **[S3 + Elasticsearch] Toy-train exposure in 2026:** a table produced by one ES|QL query that joins the two sources.
-5. A Markdown interpretation states the calculation, experimental boundary, and illustrative nature of the result.
+1. An image banner uses the unchanged [Santa and Elky illustration](../assets/santa-elky-christmas-past.png), stored in Kibana Files.
+2. A Markdown introduction identifies the two sources and the late-delivery rule.
+3. **[Elasticsearch] 2026 planned deliveries:** a bar chart querying only the indexed plan.
+4. **[S3] 2025 late-delivery rate (%):** a bar chart querying only the external archive.
+5. **[S3 + Elasticsearch] Toy-train exposure in 2026:** a table produced by one ES|QL query that joins the two sources.
+6. A Markdown interpretation states the calculation, experimental boundary, and illustrative nature of the result.
 
 The dashboard is a native saved Kibana dashboard. It does not embed an independently built web application or require another frontend dependency. The queries cover the complete fixed synthetic datasets; no date filter is included in them.
 
@@ -64,7 +65,7 @@ GET /api/dashboards/santa-esql-past-and-plan
 PUT /api/dashboards/santa-esql-past-and-plan
 ```
 
-The PUT body is [dashboards/santa-archives.json](../dashboards/santa-archives.json). The orchestrator first checks the stable dashboard ID. It creates a missing dashboard, retrieves it, and verifies the requested content while allowing only the exact API defaults recorded in [api-defaults.json](../dashboards/api-defaults.json), plus generated panel IDs. Added queries, filters, pinned controls, or changed sampling are rejected. An existing dashboard must carry the demo ownership marker and match the committed definition. A foreign or changed dashboard is not overwritten. The setup does not use the Saved Objects API.
+The [dashboard template](../dashboards/santa-archives.json) becomes the PUT body after setup resolves `__SANTA_HEADER_IMAGE_FILE_ID__` to the uploaded Kibana file ID. No machine-specific file ID is committed. The orchestrator first checks the stable dashboard ID. It creates a missing dashboard, retrieves it, and verifies the requested content while allowing only the exact API defaults recorded in [api-defaults.json](../dashboards/api-defaults.json), plus generated panel IDs. Added queries, filters, pinned controls, or changed sampling are rejected. An existing dashboard must carry the demo ownership marker and match the committed definition. A foreign or changed dashboard is not overwritten. Setup can upgrade the exact previous five-panel layout by adding the banner and shifting the existing panels downward; it verifies the full previous content first. The setup does not use the Saved Objects API.
 
 `./demo.sh setup --skip-dashboard` checks an existing compatible dashboard without creating one. `--skip-indexed-data` similarly requires the plan index, its strict mapping and ownership marker, and every expected document. The original four skip options remain independent of these two additions. `./demo.sh status` checks both resources.
 
@@ -75,3 +76,24 @@ The PUT body is [dashboards/santa-archives.json](../dashboards/santa-archives.js
 On the recorded ARM64 SNAPSHOT, the indexed-only query and mixed-source join returned the independent expected results. Dashboard API creation, retrieval, and compatible reuse also passed. A browser rendering check also passed: both bar charts showed the expected data, and the mixed table showed six rows including the 192 scenario value, without page errors or HTTP responses of 400 or above. The final fresh setup/lifecycle matrix is recorded in [validation.md](validation.md).
 
 For an earlier checkout with a different configuration fingerprint, restore its configuration or explicitly reset owned demo data before setting up this extension. The disk-watermark configuration changed to reserve local free space while keeping allocation safeguards enabled. This demo is not a production index-upgrade or dashboard-migration procedure.
+
+## Header image
+
+Setup uploads the original `assets/santa-elky-christmas-past.png` (2172 × 724)
+without resizing or re-encoding it. The native image panel displays it with
+`object_fit: contain` above the introduction. It needs no external image URL or
+additional image server. Matching files are discovered using demo metadata and
+SHA-256, and downloaded bytes are verified before reuse. Repeated setup preserves
+the same file ID. `--skip-dashboard` requires both the dashboard and its image.
+
+The Files service uses **internal Kibana APIs** in the tested snapshot, including
+`POST /api/files/files/defaultImage`, binary `PUT .../{id}/blob`, metadata/list,
+and download routes. They require authentication and an
+`x-elastic-internal-origin` header. No Kibana security policy is changed. These
+routes are version-specific and must be retested when changing Kibana versions.
+The public Dashboards API still manages the dashboard itself. The current
+`defaultImage` upload limit is 10 MiB.
+
+Image files are not included in a normal dashboard export. Use `./demo.sh setup`
+in the destination environment to upload the committed asset and resolve its
+local file ID. Cleanup never calls Files deletion APIs against external Kibana.

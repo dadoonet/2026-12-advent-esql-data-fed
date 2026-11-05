@@ -138,17 +138,23 @@ def owned_resources(cfg):
                     fail(f'Refusing to modify {kind}: reserved Compose resources belong to another directory or owner.')
 
 
-def request(cfg, method, path, payload=None, missing_ok=False, kibana=False):
+def request(cfg, method, path, payload=None, missing_ok=False, kibana=False,
+            raw_body=None, content_type="application/json", raw_response=False, internal_origin=None):
     base = cfg['KIBANA_URL'] if kibana else cfg['ES_URL']
     token = base64.b64encode(f"{cfg['ES_USERNAME']}:{cfg['ES_PASSWORD']}".encode()).decode()
-    data = None if payload is None else json.dumps(payload).encode()
+    if payload is not None and raw_body is not None:
+        fail("A request cannot contain both JSON and raw bytes.")
+    data = raw_body if raw_body is not None else (None if payload is None else json.dumps(payload).encode())
+    headers = {"Authorization": f"Basic {token}", "Content-Type": content_type, "kbn-xsrf": "santa-demo"}
+    if internal_origin:
+        headers["x-elastic-internal-origin"] = internal_origin
     req = urllib.request.Request(base.rstrip('/') + path, data=data, method=method,
-                                 headers={'Authorization': f'Basic {token}', 'Content-Type': 'application/json', 'kbn-xsrf': 'santa-demo'})
+                                 headers=headers)
     try:
         with urllib.request.urlopen(req, timeout=30) as response:
             if response.headers.get('Warning'):
                 fail(scrub(cfg, 'Elasticsearch Warning: ' + response.headers.get('Warning')))
-            return json.load(response)
+            return response.read() if raw_response else json.load(response)
     except urllib.error.HTTPError as exc:
         if exc.code == 404 and missing_ok:
             return None

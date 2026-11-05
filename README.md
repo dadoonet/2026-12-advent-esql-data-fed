@@ -41,6 +41,8 @@ The default command performs `setup`, then `run`. It:
 
 Open the [Santa dashboard](http://localhost:5601/app/dashboards#/view/santa-esql-past-and-plan) and sign in as `elastic` using `ES_PASSWORD` from your private `.env`. The setup output prints the URL for custom endpoints. Keep that file private. No credentials are printed by the orchestrator. [queries/dev-tools.http](queries/dev-tools.http) contains copy-paste requests for Kibana Dev Tools. [docs/walkthrough.md](docs/walkthrough.md) provides a short live-demo script. [Dashboard details](docs/dashboard.md) explain the indexed, external, and joined panels.
 
+The supplied Santa/Elky illustration appears as a native image banner. Setup uploads and verifies the original PNG in Kibana and resolves its local file ID automatically. See [header-image provisioning](docs/dashboard.md#header-image) for the snapshot-specific internal Files API dependency.
+
 ## Commands and incremental execution
 
 `./demo.sh` is the only required command interface:
