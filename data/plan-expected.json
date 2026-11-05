@@ -1,0 +1,78 @@
+{
+  "04-planned-volumes": [
+    {
+      "gift_category": "toy_train",
+      "planned_deliveries": 740
+    },
+    {
+      "gift_category": "books",
+      "planned_deliveries": 600
+    },
+    {
+      "gift_category": "plush",
+      "planned_deliveries": 600
+    }
+  ],
+  "05-archive-plan-join": [
+    {
+      "carrier": "Polar Parcel",
+      "country": "France",
+      "historical_total": 20,
+      "historical_late": 16,
+      "historical_late_rate": 80.0,
+      "planned_deliveries": 240,
+      "target_late_rate": 10.0,
+      "illustrative_late_deliveries": 192.0
+    },
+    {
+      "carrier": "Polar Parcel",
+      "country": "Germany",
+      "historical_total": 20,
+      "historical_late": 2,
+      "historical_late_rate": 10.0,
+      "planned_deliveries": 100,
+      "target_late_rate": 10.0,
+      "illustrative_late_deliveries": 10.0
+    },
+    {
+      "carrier": "Polar Parcel",
+      "country": "Spain",
+      "historical_total": 20,
+      "historical_late": 2,
+      "historical_late_rate": 10.0,
+      "planned_deliveries": 100,
+      "target_late_rate": 10.0,
+      "illustrative_late_deliveries": 10.0
+    },
+    {
+      "carrier": "Reindeer Express",
+      "country": "France",
+      "historical_total": 20,
+      "historical_late": 2,
+      "historical_late_rate": 10.0,
+      "planned_deliveries": 100,
+      "target_late_rate": 10.0,
+      "illustrative_late_deliveries": 10.0
+    },
+    {
+      "carrier": "Reindeer Express",
+      "country": "Germany",
+      "historical_total": 20,
+      "historical_late": 2,
+      "historical_late_rate": 10.0,
+      "planned_deliveries": 100,
+      "target_late_rate": 10.0,
+      "illustrative_late_deliveries": 10.0
+    },
+    {
+      "carrier": "Reindeer Express",
+      "country": "Spain",
+      "historical_total": 20,
+      "historical_late": 2,
+      "historical_late_rate": 10.0,
+      "planned_deliveries": 100,
+      "target_late_rate": 10.0,
+      "illustrative_late_deliveries": 10.0
+    }
+  ]
+}

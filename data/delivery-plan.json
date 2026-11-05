@@ -1,0 +1,182 @@
+[
+  {
+    "_id": "toy-train-france-reindeer-express",
+    "_source": {
+      "gift_category": "toy_train",
+      "country": "France",
+      "carrier": "Reindeer Express",
+      "planned_deliveries": 100,
+      "target_late_rate": 10.0
+    }
+  },
+  {
+    "_id": "toy-train-france-polar-parcel",
+    "_source": {
+      "gift_category": "toy_train",
+      "country": "France",
+      "carrier": "Polar Parcel",
+      "planned_deliveries": 240,
+      "target_late_rate": 10.0
+    }
+  },
+  {
+    "_id": "toy-train-germany-reindeer-express",
+    "_source": {
+      "gift_category": "toy_train",
+      "country": "Germany",
+      "carrier": "Reindeer Express",
+      "planned_deliveries": 100,
+      "target_late_rate": 10.0
+    }
+  },
+  {
+    "_id": "toy-train-germany-polar-parcel",
+    "_source": {
+      "gift_category": "toy_train",
+      "country": "Germany",
+      "carrier": "Polar Parcel",
+      "planned_deliveries": 100,
+      "target_late_rate": 10.0
+    }
+  },
+  {
+    "_id": "toy-train-spain-reindeer-express",
+    "_source": {
+      "gift_category": "toy_train",
+      "country": "Spain",
+      "carrier": "Reindeer Express",
+      "planned_deliveries": 100,
+      "target_late_rate": 10.0
+    }
+  },
+  {
+    "_id": "toy-train-spain-polar-parcel",
+    "_source": {
+      "gift_category": "toy_train",
+      "country": "Spain",
+      "carrier": "Polar Parcel",
+      "planned_deliveries": 100,
+      "target_late_rate": 10.0
+    }
+  },
+  {
+    "_id": "books-france-reindeer-express",
+    "_source": {
+      "gift_category": "books",
+      "country": "France",
+      "carrier": "Reindeer Express",
+      "planned_deliveries": 100,
+      "target_late_rate": 10.0
+    }
+  },
+  {
+    "_id": "books-france-polar-parcel",
+    "_source": {
+      "gift_category": "books",
+      "country": "France",
+      "carrier": "Polar Parcel",
+      "planned_deliveries": 100,
+      "target_late_rate": 10.0
+    }
+  },
+  {
+    "_id": "books-germany-reindeer-express",
+    "_source": {
+      "gift_category": "books",
+      "country": "Germany",
+      "carrier": "Reindeer Express",
+      "planned_deliveries": 100,
+      "target_late_rate": 10.0
+    }
+  },
+  {
+    "_id": "books-germany-polar-parcel",
+    "_source": {
+      "gift_category": "books",
+      "country": "Germany",
+      "carrier": "Polar Parcel",
+      "planned_deliveries": 100,
+      "target_late_rate": 10.0
+    }
+  },
+  {
+    "_id": "books-spain-reindeer-express",
+    "_source": {
+      "gift_category": "books",
+      "country": "Spain",
+      "carrier": "Reindeer Express",
+      "planned_deliveries": 100,
+      "target_late_rate": 10.0
+    }
+  },
+  {
+    "_id": "books-spain-polar-parcel",
+    "_source": {
+      "gift_category": "books",
+      "country": "Spain",
+      "carrier": "Polar Parcel",
+      "planned_deliveries": 100,
+      "target_late_rate": 10.0
+    }
+  },
+  {
+    "_id": "plush-france-reindeer-express",
+    "_source": {
+      "gift_category": "plush",
+      "country": "France",
+      "carrier": "Reindeer Express",
+      "planned_deliveries": 100,
+      "target_late_rate": 10.0
+    }
+  },
+  {
+    "_id": "plush-france-polar-parcel",
+    "_source": {
+      "gift_category": "plush",
+      "country": "France",
+      "carrier": "Polar Parcel",
+      "planned_deliveries": 100,
+      "target_late_rate": 10.0
+    }
+  },
+  {
+    "_id": "plush-germany-reindeer-express",
+    "_source": {
+      "gift_category": "plush",
+      "country": "Germany",
+      "carrier": "Reindeer Express",
+      "planned_deliveries": 100,
+      "target_late_rate": 10.0
+    }
+  },
+  {
+    "_id": "plush-germany-polar-parcel",
+    "_source": {
+      "gift_category": "plush",
+      "country": "Germany",
+      "carrier": "Polar Parcel",
+      "planned_deliveries": 100,
+      "target_late_rate": 10.0
+    }
+  },
+  {
+    "_id": "plush-spain-reindeer-express",
+    "_source": {
+      "gift_category": "plush",
+      "country": "Spain",
+      "carrier": "Reindeer Express",
+      "planned_deliveries": 100,
+      "target_late_rate": 10.0
+    }
+  },
+  {
+    "_id": "plush-spain-polar-parcel",
+    "_source": {
+      "gift_category": "plush",
+      "country": "Spain",
+      "carrier": "Polar Parcel",
+      "planned_deliveries": 100,
+      "target_late_rate": 10.0
+    }
+  }
+]

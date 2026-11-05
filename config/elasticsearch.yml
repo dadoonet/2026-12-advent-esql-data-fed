@@ -7,3 +7,7 @@ xpack.license.self_generated.type: trial
 esql.federation.enabled: true
 # Narrow exception for this trusted, isolated development service only.
 esql.external.allowed_endpoint_hosts: ["minio:9000"]
+# Absolute free-space reserves for this tiny local demo; disk guards remain enabled.
+cluster.routing.allocation.disk.watermark.low: 3gb
+cluster.routing.allocation.disk.watermark.high: 2gb
+cluster.routing.allocation.disk.watermark.flood_stage: 1gb

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Orchestrate a local ES|QL federation experiment without indexing data."""
+"""Orchestrate ES|QL federation and a dashboard without indexing the historical archive."""
 import argparse
 import base64
 import hashlib
@@ -143,7 +143,7 @@ def request(cfg, method, path, payload=None, missing_ok=False, kibana=False):
     token = base64.b64encode(f"{cfg['ES_USERNAME']}:{cfg['ES_PASSWORD']}".encode()).decode()
     data = None if payload is None else json.dumps(payload).encode()
     req = urllib.request.Request(base.rstrip('/') + path, data=data, method=method,
-                                 headers={'Authorization': f'Basic {token}', 'Content-Type': 'application/json'})
+                                 headers={'Authorization': f'Basic {token}', 'Content-Type': 'application/json', 'kbn-xsrf': 'santa-demo'})
     try:
         with urllib.request.urlopen(req, timeout=30) as response:
             if response.headers.get('Warning'):
@@ -324,6 +324,13 @@ def setup(cfg, args):
     wait(cfg, 'Kibana', lambda: kibana_ready(cfg))
     data_object(cfg, upload=not args.skip_data_upload)
     definitions(cfg, create=not args.skip_registration)
+    import indexed_data
+    import dashboard
+    if not args.skip_indexed_data:
+        command(cfg, [sys.executable, 'data/plan.py'])
+    indexed_data.ensure(cfg, request, create=not args.skip_indexed_data)
+    url = dashboard.ensure(cfg, request, create=not args.skip_dashboard)
+    log('dashboard', url)
     log('setup', 'Ready. Replay with ./demo.sh run; credentials remain in private .env')
 
 
@@ -336,7 +343,10 @@ def run(cfg):
         fail('S3 is not ready or authentication failed. Run ./demo.sh setup.')
     data_object(cfg)
     definitions(cfg)
+    import indexed_data
+    indexed_data.ensure(cfg, request)
     expected = json.loads((ROOT / 'data/expected.json').read_text())
+    expected.update(json.loads((ROOT / 'data/plan-expected.json').read_text()))
     STATE.mkdir(exist_ok=True, mode=0o700)
     # An index with this name would invalidate the external-data demonstration.
     resolved = request(cfg, 'GET', f'/_resolve/index/{DATASET}', missing_ok=True) or {}
@@ -348,14 +358,18 @@ def run(cfg):
         (STATE / f'{query.stem}.json').write_text(json.dumps(response, indent=2) + '\n')
         log('PASS', f'{query.stem}: {len(response["values"])} rows match independent expectations')
         print(json.dumps([dict(zip([col['name'] for col in response['columns']], row)) for row in response['values']], indent=2))
-    log('done', 'All three queries read the external Parquet dataset and matched expectations')
+    log('done', 'All five queries matched expectations: external archive, indexed plans, and their lookup join')
 
 
 def status(cfg):
+    import indexed_data
+    import dashboard
     need_credentials(cfg)
     checks = [('Elasticsearch', lambda: es_ready(cfg)), ('Kibana', lambda: kibana_ready(cfg)),
               ('S3', lambda: s3_ready(cfg)), ('Parquet object', lambda: data_object(cfg) or True),
-              ('Federation definitions', lambda: definitions(cfg) or True)]
+              ('Federation definitions', lambda: definitions(cfg) or True),
+              ('Indexed 2026 plans', lambda: indexed_data.ensure(cfg, request) or True),
+              ('Kibana dashboard', lambda: dashboard.ensure(cfg, request) or True)]
     ok = True
     for name, check in checks:
         try:
@@ -393,6 +407,8 @@ def main():
         ('s3-start', 'Reuse configured S3 endpoint; check authentication'),
         ('data-upload', 'Reuse the existing Parquet object; check its contents'),
         ('registration', 'Reuse compatible data source and dataset definitions'),
+        ('indexed-data', 'Reuse the indexed 2026 plans; check mapping and contents'),
+        ('dashboard', 'Reuse the compatible dashboard; check its definition'),
     ]:
         parser.add_argument('--skip-' + flag, action='store_true', help=description + ' (default/setup only)')
     parser.add_argument('--yes', action='store_true', help='Confirm deletion of owned persistent data (reset only)')
@@ -400,7 +416,7 @@ def main():
     if args.command == 'help':
         parser.print_help()
         return
-    if args.command not in ('all', 'setup') and any(getattr(args, 'skip_' + flag) for flag in ('stack_start', 's3_start', 'data_upload', 'registration')):
+    if args.command not in ('all', 'setup') and any(getattr(args, 'skip_' + flag) for flag in ('stack_start', 's3_start', 'data_upload', 'registration', 'indexed_data', 'dashboard')):
         parser.error('Skip options apply only to the default command and setup.')
     if args.yes and args.command != 'reset':
         parser.error('--yes applies only to reset.')
