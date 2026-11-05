@@ -1,0 +1,61 @@
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ES_VERSION:-9.6.0-SNAPSHOT}
+    labels:
+      io.santa.advent.owner: ${DEMO_OWNER:?Run through demo.sh}
+    environment:
+      ELASTIC_PASSWORD: ${ES_PASSWORD:?Run through demo.sh}
+      ES_JAVA_OPTS: ${ES_JAVA_OPTS:--Xms1g -Xmx1g}
+    volumes:
+      - es-data:/usr/share/elasticsearch/data
+      - ./config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+    ports:
+      - "127.0.0.1:${ES_PORT:-9200}:9200"
+    mem_limit: 4g
+  kibana:
+    image: docker.elastic.co/kibana/kibana:${KIBANA_VERSION:-9.6.0-SNAPSHOT}
+    labels:
+      io.santa.advent.owner: ${DEMO_OWNER:?Run through demo.sh}
+    environment:
+      ELASTICSEARCH_PASSWORD: ${KIBANA_PASSWORD:?Run through demo.sh}
+      XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY: ${KIBANA_ENCRYPTION_KEY:?Run through demo.sh}
+      XPACK_SECURITY_ENCRYPTIONKEY: ${KIBANA_ENCRYPTION_KEY}
+      XPACK_REPORTING_ENCRYPTIONKEY: ${KIBANA_ENCRYPTION_KEY}
+    volumes:
+      - kibana-data:/usr/share/kibana/data
+      - ./config/kibana.yml:/usr/share/kibana/config/kibana.yml:ro
+    ports:
+      - "127.0.0.1:${KIBANA_PORT:-5601}:5601"
+    mem_limit: 2g
+  minio:
+    image: santa-esql-advent-minio:source
+    build:
+      context: .
+      dockerfile: config/Dockerfile.minio
+    labels:
+      io.santa.advent.owner: ${DEMO_OWNER:?Run through demo.sh}
+    environment:
+      MINIO_ROOT_USER: ${S3_ACCESS_KEY:?Run through demo.sh}
+      MINIO_ROOT_PASSWORD: ${S3_SECRET_KEY:?Run through demo.sh}
+      MINIO_REGION_NAME: ${S3_REGION:-us-east-1}
+    command: server /data --console-address :9001
+    volumes:
+      - minio-data:/data
+    ports:
+      - "127.0.0.1:${S3_PORT:-9000}:9000"
+      - "127.0.0.1:${S3_CONSOLE_PORT:-9001}:9001"
+    mem_limit: 1g
+volumes:
+  es-data:
+    labels:
+      io.santa.advent.owner: ${DEMO_OWNER}
+  kibana-data:
+    labels:
+      io.santa.advent.owner: ${DEMO_OWNER}
+  minio-data:
+    labels:
+      io.santa.advent.owner: ${DEMO_OWNER}
+networks:
+  default:
+    labels:
+      io.santa.advent.owner: ${DEMO_OWNER}

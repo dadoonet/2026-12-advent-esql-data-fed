@@ -1,0 +1,5 @@
+FROM santa_deliveries_2025
+| WHERE gift_category == "toy_train"
+| STATS total = COUNT(*), late = COUNT(*) WHERE delay_minutes > 0 BY carrier, country
+| EVAL late_rate = 100.0 * late / total
+| SORT late_rate DESC, carrier ASC, country ASC

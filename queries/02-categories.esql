@@ -1,0 +1,4 @@
+FROM santa_deliveries_2025
+| STATS total = COUNT(*), late = COUNT(*) WHERE delay_minutes > 0 BY gift_category
+| EVAL late_rate = 100.0 * late / total
+| SORT late_rate DESC, gift_category ASC

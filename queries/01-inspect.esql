@@ -1,0 +1,4 @@
+FROM santa_deliveries_2025
+| KEEP delivery_id, country, gift_category, carrier, promised_at, delivered_at, delay_minutes
+| SORT delivery_id ASC
+| LIMIT 5

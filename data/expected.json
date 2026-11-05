@@ -1,0 +1,113 @@
+{
+  "01-inspect": [
+    {
+      "delivery_id": "delivery-0001",
+      "country": "France",
+      "gift_category": "toy_train",
+      "carrier": "Reindeer Express",
+      "promised_at": "2025-12-25T00:01:00Z",
+      "delivered_at": "2025-12-24T23:45:00Z",
+      "delay_minutes": -16
+    },
+    {
+      "delivery_id": "delivery-0002",
+      "country": "France",
+      "gift_category": "toy_train",
+      "carrier": "Reindeer Express",
+      "promised_at": "2025-12-25T00:02:00Z",
+      "delivered_at": "2025-12-24T23:41:00Z",
+      "delay_minutes": -21
+    },
+    {
+      "delivery_id": "delivery-0003",
+      "country": "France",
+      "gift_category": "toy_train",
+      "carrier": "Reindeer Express",
+      "promised_at": "2025-12-25T00:03:00Z",
+      "delivered_at": "2025-12-24T23:54:00Z",
+      "delay_minutes": -9
+    },
+    {
+      "delivery_id": "delivery-0004",
+      "country": "France",
+      "gift_category": "toy_train",
+      "carrier": "Reindeer Express",
+      "promised_at": "2025-12-25T00:04:00Z",
+      "delivered_at": "2025-12-24T23:39:00Z",
+      "delay_minutes": -25
+    },
+    {
+      "delivery_id": "delivery-0005",
+      "country": "France",
+      "gift_category": "toy_train",
+      "carrier": "Reindeer Express",
+      "promised_at": "2025-12-25T00:05:00Z",
+      "delivered_at": "2025-12-24T23:42:00Z",
+      "delay_minutes": -23
+    }
+  ],
+  "02-categories": [
+    {
+      "gift_category": "toy_train",
+      "total": 120,
+      "late": 26,
+      "late_rate": 21.666666666666668
+    },
+    {
+      "gift_category": "books",
+      "total": 120,
+      "late": 12,
+      "late_rate": 10.0
+    },
+    {
+      "gift_category": "plush",
+      "total": 120,
+      "late": 12,
+      "late_rate": 10.0
+    }
+  ],
+  "03-investigate": [
+    {
+      "carrier": "Polar Parcel",
+      "country": "France",
+      "total": 20,
+      "late": 16,
+      "late_rate": 80.0
+    },
+    {
+      "carrier": "Polar Parcel",
+      "country": "Germany",
+      "total": 20,
+      "late": 2,
+      "late_rate": 10.0
+    },
+    {
+      "carrier": "Polar Parcel",
+      "country": "Spain",
+      "total": 20,
+      "late": 2,
+      "late_rate": 10.0
+    },
+    {
+      "carrier": "Reindeer Express",
+      "country": "France",
+      "total": 20,
+      "late": 2,
+      "late_rate": 10.0
+    },
+    {
+      "carrier": "Reindeer Express",
+      "country": "Germany",
+      "total": 20,
+      "late": 2,
+      "late_rate": 10.0
+    },
+    {
+      "carrier": "Reindeer Express",
+      "country": "Spain",
+      "total": 20,
+      "late": 2,
+      "late_rate": 10.0
+    }
+  ]
+}

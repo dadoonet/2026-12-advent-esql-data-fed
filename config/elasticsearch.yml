@@ -1,0 +1,9 @@
+cluster.name: santa-esql-advent
+network.host: 0.0.0.0
+discovery.type: single-node
+xpack.security.enabled: true
+xpack.security.http.ssl.enabled: false
+xpack.license.self_generated.type: trial
+esql.federation.enabled: true
+# Narrow exception for this trusted, isolated development service only.
+esql.external.allowed_endpoint_hosts: ["minio:9000"]
