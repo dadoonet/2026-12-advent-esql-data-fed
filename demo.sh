@@ -13,7 +13,7 @@ esac
 if [ ! -x .venv/bin/python ]; then
   python3 -m venv .venv
 fi
-if ! .venv/bin/python -c 'import boto3, pyarrow; assert pyarrow.__version__ == "23.0.1"; assert boto3.__version__ == "1.40.70"' >/dev/null 2>&1; then
+if ! .venv/bin/python scripts/check_dependencies.py >/dev/null 2>&1; then
   echo '[prepare] Installing pinned Python dependencies into .venv'
   .venv/bin/python -m pip --disable-pip-version-check install -r requirements.txt
 fi

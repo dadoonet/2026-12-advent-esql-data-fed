@@ -189,3 +189,14 @@ by this extension's actual rendering check. Still untested: other builds,
 AMD64 execution, final 9.6 release, production scale, and external managed
 Elasticsearch/TLS configurations. The 192 figure is an illustrative scenario,
 not a forecast.
+
+### Dependency alerts corrected before publishing the extension
+
+GitHub reported six high-severity Dependabot alerts for the original
+`urllib3==2.5.0` pin. Its advisory metadata identified `2.8.0` as the first
+version fixing all six affected ranges. The pin is now `urllib3==2.8.0`.
+Bootstrap checks every exact requirement, including transitive pins and the
+nested PyArrow requirements, so an existing virtual environment is updated when
+any pin changes. The complete default command passed with the corrected version.
+A new temporary MinIO object was also uploaded, read back byte-for-byte, and
+deleted successfully; the committed archive object was preserved.

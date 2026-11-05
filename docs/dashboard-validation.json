@@ -113,5 +113,15 @@
     "command": "Chrome dashboard render",
     "outcome": "PASS",
     "detail": "Two bar charts and six-row joined table; no page or HTTP errors"
+  },
+  {
+    "command": "./demo.sh with urllib3==2.8.0",
+    "outcome": "PASS",
+    "detail": "Existing virtual environment upgraded; all five queries validated"
+  },
+  {
+    "command": "new-object MinIO upload/read/delete with urllib3==2.8.0",
+    "outcome": "PASS",
+    "detail": "Temporary object round-trip matched; archive object preserved"
   }
 ]
