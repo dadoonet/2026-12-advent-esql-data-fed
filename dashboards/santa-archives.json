@@ -139,5 +139,7 @@
         "content": "**Interpretation:** `illustrative_late_deliveries = planned_deliveries * historical_late / historical_total`. This applies the 2025 rate to the 2026 plan as an **illustrative unchanged-rate scenario, not a forecast**.\n\nThe 2025 archive remains external; only the 2026 plan is indexed. Data Federation is experimental, and this MinIO compatibility experiment is not officially supported by Elastic."
       }
     }
-  ]
+  ],
+  "filters": [],
+  "pinned_panels": []
 }

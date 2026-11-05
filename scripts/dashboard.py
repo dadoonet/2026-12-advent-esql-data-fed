@@ -10,18 +10,26 @@ ID = 'santa-esql-past-and-plan'
 PATH = '/api/dashboards/' + ID
 MARKER = 'Managed by santa-esql-advent: past-and-plan-v1.'
 DEFINITION = ROOT / 'dashboards/santa-archives.json'
+# Only these exact observed API defaults may be added to the requested payload.
+API_DEFAULTS = json.loads((ROOT / 'dashboards/api-defaults.json').read_text())
 
 
-def _matches(desired, actual):
-    """Allow API-added defaults while preserving requested values and list order."""
+def _matches(desired, actual, path=()):
+    """Allow recorded API defaults and generated panel IDs; reject all other drift."""
     if isinstance(desired, dict):
-        return isinstance(actual, dict) and all(
-            key in actual and _matches(value, actual[key])
-            for key, value in desired.items()
-        )
+        if not isinstance(actual, dict):
+            return False
+        for key in actual.keys() - desired.keys():
+            if path == ('panels', '*') and key == 'id' and isinstance(actual[key], str):
+                continue
+            default_path = '/'.join((*path, key))
+            if default_path not in API_DEFAULTS or actual[key] != API_DEFAULTS[default_path]:
+                return False
+        return all(key in actual and _matches(value, actual[key], (*path, key))
+                   for key, value in desired.items())
     if isinstance(desired, list):
         return isinstance(actual, list) and len(desired) == len(actual) and all(
-            _matches(wanted, received)
+            _matches(wanted, received, (*path, '*'))
             for wanted, received in zip(desired, actual)
         )
     return desired == actual

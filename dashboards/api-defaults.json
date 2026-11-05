@@ -1,0 +1,101 @@
+{
+  "options": {
+    "auto_apply_filters": true,
+    "hide_panel_borders": false,
+    "hide_panel_titles": false,
+    "sync_colors": false,
+    "sync_cursor": true,
+    "sync_tooltips": false,
+    "use_margins": true
+  },
+  "panels/*/config/axis": {
+    "x": {
+      "domain": {
+        "rounding": false,
+        "type": "fit"
+      },
+      "grid": {
+        "visible": true
+      },
+      "labels": {
+        "orientation": "horizontal"
+      },
+      "scale": "ordinal",
+      "ticks": {
+        "visible": true
+      },
+      "title": {
+        "visible": true
+      }
+    },
+    "y": {
+      "domain": {
+        "rounding": true,
+        "type": "full"
+      },
+      "grid": {
+        "visible": true
+      },
+      "labels": {
+        "orientation": "horizontal"
+      },
+      "scale": "linear",
+      "ticks": {
+        "visible": true
+      },
+      "title": {
+        "visible": true
+      }
+    }
+  },
+  "panels/*/config/ignore_global_filters": false,
+  "panels/*/config/layers/*/ignore_global_filters": false,
+  "panels/*/config/layers/*/sampling": 1,
+  "panels/*/config/layers/*/y/*/axis": "y",
+  "panels/*/config/layers/*/y/*/color": {
+    "type": "auto"
+  },
+  "panels/*/config/legend": {
+    "layout": {
+      "truncate": {
+        "max_lines": 1
+      },
+      "type": "grid"
+    },
+    "placement": "outside",
+    "position": "right",
+    "visibility": "hidden"
+  },
+  "panels/*/config/metrics/*/alignment": "right",
+  "panels/*/config/metrics/*/color": {
+    "type": "auto"
+  },
+  "panels/*/config/metrics/*/visible": true,
+  "panels/*/config/rows/*/alignment": "left",
+  "panels/*/config/rows/*/click_filter": false,
+  "panels/*/config/rows/*/color": {
+    "type": "auto"
+  },
+  "panels/*/config/rows/*/visible": true,
+  "panels/*/config/sampling": 1,
+  "panels/*/config/settings": {
+    "open_links_in_new_tab": true
+  },
+  "panels/*/config/styling": {
+    "bars": {
+      "data_labels": {
+        "visible": false
+      },
+      "minimum_height": 1
+    },
+    "overlays": {
+      "current_time_marker": {
+        "visible": false
+      },
+      "partial_buckets": {
+        "visible": false
+      }
+    }
+  },
+  "tags": []
+}

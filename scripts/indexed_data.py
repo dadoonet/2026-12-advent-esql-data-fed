@@ -46,6 +46,8 @@ def ensure(cfg, request, create=False):
     response = request(cfg, "POST", f"/{INDEX}/_search", {
         "size": 10000, "track_total_hits": True, "query": {"match_all": {}},
     })
+    if response.get("timed_out") or response.get("_shards", {}).get("failed", 0):
+        raise RuntimeError("Cannot verify lookup index contents: search timed out or shards failed.")
     hits = response["hits"]["hits"]
     total = response["hits"]["total"]
     if isinstance(total, dict):
