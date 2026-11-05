@@ -125,13 +125,15 @@ def owned_resources(cfg):
         ids = command(cfg, ['docker', *listing, '--filter', f'label=com.docker.compose.project={PROJECT}'], True).split()
         if kind == 'container':
             all_names = command(cfg, ['docker', 'ps', '-a', '--format', '{{.Names}}'], True).split()
+        elif kind == 'network':
+            all_names = command(cfg, ['docker', 'network', 'ls', '--format', '{{.Name}}'], True).split()
         else:
             all_names = command(cfg, ['docker', *listing], True).split()
         ids = sorted(set(ids) | (set(reserved) & set(all_names)))
         if ids:
             entries = json.loads(command(cfg, ['docker', *inspecting, *ids], True))
             for entry in entries:
-                labels = entry.get('Config', {}).get('Labels', {}) if kind == 'container' else entry.get('Labels', {})
+                labels = (entry.get('Config', {}).get('Labels') if kind == 'container' else entry.get('Labels')) or {}
                 if labels.get('io.santa.advent.owner') != OWNER:
                     fail(f'Refusing to modify {kind}: reserved Compose resources belong to another directory or owner.')
 
