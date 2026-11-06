@@ -1,0 +1,58 @@
+{
+  "date": "2026-11-06",
+  "elasticsearch": {
+    "version": "9.6.0-SNAPSHOT",
+    "build_hash": "ab1cb79d28530e112b9178ebc14942d869410c7f"
+  },
+  "kibana": {
+    "version": "9.6.0",
+    "build_hash": "a95773df3536f3d052df32358d64a9b704811e45"
+  },
+  "historical_rows": 772,
+  "historical_late": 102,
+  "plans": 18,
+  "planned_deliveries": 2485,
+  "archive_sha256": "762df9959484526f1dd2a2b46debec85dd536515c806387244a65c09c4cf3772",
+  "checks": [
+    {
+      "command": "./demo.sh setup --skip-stack-start --skip-s3-start --no-open",
+      "outcome": "PASS",
+      "detail": "Guarded upgrade preserves previous archive, index, description and compatible settings"
+    },
+    {
+      "command": "./demo.sh --no-open",
+      "outcome": "PASS",
+      "detail": "Setup plus five query validations"
+    },
+    {
+      "command": "./demo.sh --skip-stack-start --skip-s3-start --no-open",
+      "outcome": "PASS",
+      "detail": "Final plans2485 and all five expected results"
+    },
+    {
+      "command": "./demo.sh setup with all six skip options and --no-open",
+      "outcome": "PASS",
+      "detail": "Compatible resources reused"
+    },
+    {
+      "command": "Repeat both generators",
+      "outcome": "PASS",
+      "detail": "All four artifacts byte-identical; 18 distinct plan counts"
+    },
+    {
+      "command": "Dataset/dashboard migration negative controls",
+      "outcome": "PASS",
+      "detail": "Changed bytes, unknown configuration, user edits and skipped upgrades refuse writes"
+    },
+    {
+      "command": "Color boundary controls",
+      "outcome": "PASS",
+      "detail": "-2pp is orange; +5pp is red; exactly two rows per color"
+    },
+    {
+      "command": "Chrome render",
+      "outcome": "PASS",
+      "detail": "Santa category colors and six colored gap cells; no page/HTTP errors"
+    }
+  ]
+}

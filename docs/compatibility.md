@@ -22,7 +22,7 @@ The [data-source settings reference](https://www.elastic.co/docs/reference/query
 esql.external.allowed_endpoint_hosts: ["minio:9000"]
 ```
 
-The source uses `auth: static_credentials`, an access key and secret key, and `addressing_style: path`. This produces paths such as `/santa-archives/christmas-2025.parquet` rather than requiring a bucket subdomain. `http://minio:9000` is reachable through Docker's service DNS on the shared Compose network. `http://localhost:9000` inside Elasticsearch would address its own container.
+The source uses `auth: static_credentials`, an access key and secret key, and `addressing_style: path`. This produces paths such as `/santa-archives/christmas-2025-v2.parquet` rather than requiring a bucket subdomain. `http://minio:9000` is reachable through Docker's service DNS on the shared Compose network. `http://localhost:9000` inside Elasticsearch would address its own container.
 
 The [dataset settings reference](https://www.elastic.co/docs/reference/query-languages/esql/esql-data-federation-dataset-settings) places `region` on the dataset. The current 9.6 S3 source also confirms that a source-level region is retained for backward compatibility but ignored. This demo explicitly sets dataset region `us-east-1` to avoid discovery ambiguity with a custom endpoint.
 
@@ -55,12 +55,12 @@ PUT /_query/data_source/santa_minio
 PUT /_query/dataset/santa_deliveries_2025
 {
   "data_source": "santa_minio",
-  "resource": "s3://santa-archives/christmas-2025.parquet",
+  "resource": "s3://santa-archives/christmas-2025-v2.parquet",
   "settings": {"region": "us-east-1"}
 }
 ```
 
-GET responses wrap definitions in `data_sources` and `datasets` arrays. Source secrets are redacted. Setup compares visible connection settings and the dataset definition; it never replaces an incompatible existing definition. Queries use ordinary `FROM santa_deliveries_2025` through `POST /_query`.
+GET responses wrap definitions in `data_sources` and `datasets` arrays. Source secrets are redacted. Setup compares visible connection settings and the dataset definition; it refuses an incompatible definition. A narrowly guarded revision upgrade may change the dataset resource from the exact known previous archive to the v2 object, after verifying its digest and compatible settings. It preserves those settings, including `region` and an optional `schema_resolution: first_file_wins`. Queries use ordinary `FROM santa_deliveries_2025` through `POST /_query`.
 
 ## Cluster-state encryption discovered during execution
 
@@ -77,13 +77,17 @@ Custom security/HTTP configuration bypasses the automatic setup that otherwise p
 
 Setup now writes `cluster.state.encryption.active_password_id` with value `santa-demo` and `cluster.state.encryption.password.santa-demo` with a generated local password, using `elasticsearch-keystore add --stdin --force`. The password is passed on stdin and never logged. It persists in private `.env`; the keystore persists in `es-config`. Setup reloads secure settings with `POST /_nodes/reload_secure_settings`. The default requirement for encryption remains enabled. This prerequisite is separate from trial licensing.
 
-## Query execution observation
+## Query and dashboard revisions
 
-The original three external-dataset queries successfully matched their independent expectations on the observed build. Initial aggregate queries returned the warning `No limit defined, adding default limit of [1000]`; explicit `LIMIT 10` clauses avoid that warning.
+The earlier revision successfully executed all five queries on the observed build: three external archive queries, one indexed-plan query, and a genuine multi-key `LOOKUP JOIN`. It also passed native dashboard API and browser checks. Those executed results are retained in [validation.md](validation.md). Initial aggregate queries returned `No limit defined, adding default limit of [1000]`; explicit `LIMIT 10` clauses avoid that warning.
 
-The extension also executed two queries successfully: one aggregates only the indexed 2026 plans, and the other performs a genuine multi-key `LOOKUP JOIN` from the external 2025 dataset to the `index.mode: lookup` index `santa_delivery_plan_2026`. The keys are `gift_category`, `carrier`, and `country`. The join returned all six toy-train routes and matched independently generated expectations, including 192 illustrative late deliveries for the deliberately problematic route. The historical Parquet records remain external; only new synthetic 2026 planning data is indexed.
+The current varied-data revision uses 772 historical records, 102 late deliveries, and 18 indexed plan documents totaling 2,485 deliveries. Historical toy-train delays are 68 of 261 (about 26.05%). The join uses the keys `gift_category`, `carrier`, and `country` from the external `santa_deliveries_2025` dataset to `index.mode: lookup` index `santa_delivery_plan_2026_v2`. Polar Parcel / France combines 44 late records out of 57 with 290 planned deliveries and an 8% target, yielding about 223.9 illustrative late deliveries and a +69.19 percentage-point gap. The historical archive remains external.
 
-Kibana's `PUT /api/dashboards/santa-esql-past-and-plan` API created a native five-panel dashboard. GET verification and compatible reuse passed. A browser check then rendered both source bar charts and the mixed-source table with the expected six rows and the 192 scenario value; no page errors or HTTP responses of 400 or above were observed. The stable dashboard ID and managed content are checked before reuse; existing foreign or changed definitions are not overwritten. See [dashboard.md](dashboard.md) for the query and lifecycle details.
+The current dashboard template uses six native panels, including the existing image banner. It maps gift categories to red/orange/green and conditionally colors only the calculated `late_rate_gap` metric. Dynamic metric coloring applies thresholds to that metric's own value. Computing the difference in ES|QL avoids pretending the table can color a historical-rate cell using another column's route-specific target. Full-precision values determine threshold membership; one-decimal formatting affects display only. See [dashboard.md](dashboard.md) for the exact rules and boundary cases.
+
+Setup preserves the previous S3 object and lookup index, uploads `christmas-2025-v2.parquet`, and creates `santa_delivery_plan_2026_v2`. The unchanged external dataset name is updated only for a verified known prior resource and compatible settings. Kibana's stable dashboard ID is similarly upgraded only if its complete content matches the committed previous six-panel fixture or the exact five-panel layout before the banner. Unknown resources and changed content are refused. No reset or old-data deletion is part of this normal revision upgrade.
+
+Live query, API, guarded upgrade, and repeated-setup validation passed for this revision. Browser inspection verified the Santa category colors and all six target-gap cells, with two red, two orange, and two green. No page or HTTP errors were observed. The validation record distinguishes these checks from earlier cold-start/lifecycle results.
 
 During index creation, the Docker filesystem reached about 90.1% usage: approximately 10 GB free, below the default high-watermark reserve of roughly 10.2 GB. The shard could not allocate and index creation timed out. The local node configuration now uses explicit free-space allocation thresholds of low `3gb`, high `2gb`, and flood stage `1gb`; disk safeguards remain enabled, and host Docker settings are unchanged. Earlier persistent configurations require an explicit owned-data reset because their recorded configuration fingerprint differs.
 

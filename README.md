@@ -4,7 +4,7 @@ A runnable companion demo for **“The Ghost of Christmas Past: Querying Santa�
 
 Santa is preparing the 2026 delivery run. The Ghost of Christmas Past asks him to investigate Christmas 2025 delays. The archive is a small Parquet object in local MinIO. Elasticsearch queries that object through **ES|QL Data Federation**, without ingesting the historical records into an index. A separate synthetic 2026 plan lives in Elasticsearch. A native Kibana dashboard shows queries against each source, plus a real ES|QL join between them.
 
-> **Validated locally on ARM64.** The complete default command passed from empty owned persistent state. All five queries matched independent expectations, including the real S3-to-Elasticsearch `LOOKUP JOIN`. The native dashboard rendered both charts and the joined table correctly. Repeated setup, all skip steps, missing/incompatible resources, and down/restart passed; see the [validation record](docs/validation.md).
+> **Validated locally on ARM64.** The varied deterministic data, all five queries, guarded upgrade, and repeated setup passed. Browser verification confirmed the Santa category palette and exactly two red, two orange, and two green target-gap cells. Earlier cold-start/lifecycle checks and the scope of this revision’s checks are recorded in the [validation record](docs/validation.md).
 >
 > **Experimental compatibility:** Elastic documents Amazon S3 support and explicitly excludes other S3-compatible services from validated support. MinIO is an intentional local compatibility experiment. A successful run demonstrates compatibility with the recorded builds only; it does not establish official MinIO support. The federation feature itself is experimental.
 
@@ -33,9 +33,9 @@ The default command performs `setup`, then `run`. It:
 1. Creates a local `.venv` and installs pinned dependencies.
 2. Generates private local credentials in `.env` if the file does not exist.
 3. Builds and starts MinIO, prepares the Elasticsearch keystore, and starts Elasticsearch and Kibana.
-4. Regenerates the deterministic Parquet file and uploads it to `santa-archives/christmas-2025.parquet`.
+4. Regenerates the deterministic Parquet file and uploads it to `santa-archives/christmas-2025-v2.parquet`.
 5. Registers the `santa_minio` data source and `santa_deliveries_2025` external dataset.
-6. Generates and indexes 18 synthetic 2026 route plans in the lookup index `santa_delivery_plan_2026`.
+6. Generates and indexes 18 synthetic 2026 route plans in the lookup index `santa_delivery_plan_2026_v2`.
 7. Creates or verifies the native Kibana dashboard, using the Dashboards API.
 8. Runs five queries and compares every result with expectations derived independently from the generators’ source records.
 
@@ -123,7 +123,7 @@ A stored configuration fingerprint prevents silently changing versions, ports, c
 
 ## Historical dataset and three archive queries
 
-[data/generate.py](data/generate.py) uses fixed seed `20251225` and writes 360 flat synthetic records: 3 gift categories × 3 countries × 2 carriers × 20 deliveries. No personal data is included. [data/deliveries.parquet](data/deliveries.parquet) is small enough to commit.
+[data/generate.py](data/generate.py) uses fixed seed `20251225` and writes 772 flat synthetic records across 18 category/country/carrier groups. Group sizes range from 31 to 57, with varied late counts. No personal data is included. [data/deliveries.parquet](data/deliveries.parquet) is small enough to commit.
 
 Fields are `delivery_id`, `country`, `gift_category`, `carrier`, `promised_at`, `delivered_at`, and `delay_minutes`. Timestamps are simple UTC ISO-8601 strings. `delay_minutes` is the signed integer number of minutes from promised to actual delivery: negative means early, zero means on time, and **strictly positive means late**.
 
@@ -146,7 +146,7 @@ FROM santa_deliveries_2025
 | LIMIT 10
 ```
 
-Expected: `toy_train` has 26 late deliveries out of 120, approximately **21.67%**. `books` and `plush` each have 12 out of 120, **10%**.
+Expected: `toy_train` has 68 late deliveries out of 261, approximately **26.05%**; `plush` has 18 out of 253, **7.11%**; and `books` has 16 out of 258, **6.20%**. The counts make the different rates comparable.
 
 Investigate toy trains by carrier and country:
 
@@ -159,21 +159,27 @@ FROM santa_deliveries_2025
 | LIMIT 10
 ```
 
-Expected: **Polar Parcel / France** has 16 late deliveries out of 20, **80%**. Each other toy-train carrier/country group has 2 out of 20, **10%**. There are 50 late deliveries overall.
+Expected: **Polar Parcel / France** has 44 late deliveries out of 57, approximately **77.19%**. The other five toy-train groups have different counts and rates, from 2 out of 31 (**6.45%**) to 9 out of 49 (**18.37%**). There are 102 late deliveries overall.
 
 The generator computes [data/expected.json](data/expected.json) directly from its Python records, independently of Elasticsearch. The validator checks row order, columns, counts, values, and numeric rates with relative tolerance `1e-8` and absolute tolerance `1e-6`; partial results or warnings fail validation. Successful responses are saved locally under `.local`. No indexed copy of the historical archive is created, and `run` checks for an index/alias/data-stream conflict with the external dataset name.
 
 ## Three query families in one dashboard
 
-The original three queries above read only the 2025 archive. Two additional tested queries extend the story:
+The original three queries above read only the 2025 archive. Two additional queries extend the story:
 
-- **Elasticsearch only:** [04-planned-volumes.esql](queries/04-planned-volumes.esql) sums the 2026 plan: 740 toy-train deliveries, 600 books, and 600 plush toys, or 1,940 planned deliveries in total.
+- **Elasticsearch only:** [04-planned-volumes.esql](queries/04-planned-volumes.esql) sums the 2026 plan: 1,160 toy-train deliveries, 765 plush toys, and 560 books, or 2,485 planned deliveries in total.
 - **External S3 only:** the category-rate panel uses the archive query above; the Parquet records remain in MinIO.
 - **S3 + Elasticsearch:** [05-archive-plan-join.esql](queries/05-archive-plan-join.esql) aggregates historical toy-train deliveries, then `LOOKUP JOIN`s the indexed plan on `gift_category`, `carrier`, and `country`.
 
-The plan has one document per category/country/carrier combination: 100 deliveries per route, except 240 toy trains for Polar Parcel in France. Every route has a 10% target late rate. Applying the historical 80% rate to that route’s 240 planned deliveries gives **192 illustrative late deliveries**, compared with 10 on each other toy-train route. This is a deliberately unchanged-rate scenario, not a forecast.
+The plan has one document per category/country/carrier combination, with 18 distinct delivery volumes ranging from 65 to 290 and route-specific target late rates from 6% to 12%. Polar Parcel in France plans 290 toy-train deliveries against an 8% target. Applying its historical `44 / 57` late rate gives approximately **223.9 illustrative late deliveries**. Its historical rate exceeds the target by **69.2 percentage points**. This is a deliberately unchanged-rate scenario, not a forecast.
 
-[data/plan.py](data/plan.py) deterministically generates the plan and its independent expected results from the source records. The dashboard contains five native panels: two explanatory Markdown panels, one bar chart per source, and one mixed-source table. See [docs/dashboard.md](docs/dashboard.md) for the full join and API lifecycle.
+[data/plan.py](data/plan.py) deterministically generates the plan and its independent expected results from the source records. The dashboard contains six native panels: the Santa/Elky image banner, two explanatory Markdown panels, one bar chart per source, and one mixed-source table. Both charts identify toy trains in Santa red, books in orange, and plush toys in green. Only the table’s gap-to-target column is conditionally colored; its legend explains the separate risk thresholds. See [docs/dashboard.md](docs/dashboard.md) for the full join and API lifecycle.
+
+## Updating an existing demo
+
+Run `./demo.sh setup` to prepare the varied-data revision. It uploads the new `christmas-2025-v2.parquet` object and creates `santa_delivery_plan_2026_v2`; the previous object and index are preserved. The external dataset keeps its name, `santa_deliveries_2025`. Setup changes its resource pointer only after verifying the exact known previous object digest and compatible dataset settings, preserving those settings. Unknown resources or configuration drift are rejected.
+
+The dashboard updater accepts only the committed previous six-panel layout or its exact five-panel form before the image banner was added, then upgrades it to the current template. Other dashboard edits are not overwritten. Normal revision upgrades do not require `reset`. Omit `--skip-registration` and `--skip-dashboard` for this upgrade; their prerequisite checks deliberately refuse an older definition. Skipping indexed-data preparation also requires the new v2 index to exist already.
 
 ## Troubleshooting
 

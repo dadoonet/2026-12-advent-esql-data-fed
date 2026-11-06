@@ -239,3 +239,52 @@ A live reused-service setup passed with redirected output; the actual password
 was asserted absent without being printed. Invalid `--no-open` usage with run,
 status, down, and reset was rejected before any side effects. No real terminal
 password output or actual default-browser launch was exercised in these tests.
+
+## Varied data and Santa colors — 2026-11-06
+
+The current archive has **772 deliveries, 102 late**. All 18 historical route
+sample sizes differ, ranging from 31 to 57. Toy trains have 68 late deliveries
+out of 261 (26.05%); plush has 18/253 (7.11%); books has 16/258 (6.20%).
+The unchanged seed remains `20251225`, with the same flat schema and late rule.
+The 18 planning documents have distinct volumes from 65 to 290 and targets from
+6% to 12%. Category volumes are 1,160 toy trains, 765 plush, and 560 books:
+**2,485 planned deliveries**.
+
+The strong outlier is still Polar Parcel / France: 44 of 57 deliveries late
+(77.19%) against an 8% target, a +69.19 percentage-point gap. Its 290 planned
+deliveries yield about 223.9 illustrative late deliveries at an unchanged rate.
+All six mixed-source rows now have distinct counts, rates, targets, and scenarios.
+
+Executed checks passed:
+
+- Guarded live upgrade to `christmas-2025-v2.parquet` and
+  `santa_delivery_plan_2026_v2`, followed by all five query validations.
+- Full `./demo.sh --no-open`, repeated setup, final setup+run with reused services,
+  and setup with all six skip flags.
+- Independent expectations, Parquet round-trip, byte-identical regeneration of
+  all four artifacts, syntax, query-copy, and secret-publication checks.
+- The prior Parquet object's original SHA-256 and old plan index's 18 documents
+  were verified unchanged after upgrade. The new named dataset retains compatible
+  settings, including `schema_resolution: first_file_wins` where present.
+- Synthetic migration controls preserved an existing description and refused
+  changed archive bytes, unknown settings/fields, dashboard edits, and skipped
+  upgrades before writing. Only the known previous dashboard fixture can migrate.
+- Browser inspection verified aligned red/orange/green category bars, one-decimal
+  numeric display, and exactly two red, two orange, and two green gap cells.
+  Computed cell backgrounds were `rgb(217,45,53)`, `rgb(245,158,11)`, and
+  `rgb(46,125,80)`. Native contrast text remained readable. No page or HTTP errors
+  occurred. Screenshots were visually inspected and remain uncommitted.
+
+Table rules use the **unrounded percentage-point gap** between historical rate
+and route target: green `< -2`, orange `>= -2 and < 5`, red `>= 5`. Exact boundary
+controls passed at -2 and +5. Ordinary counts/rates remain neutral; category
+colors in charts identify gifts, rather than applying the table's risk rule.
+Kibana normalizes number formatting with `compact: false`; the template now
+states that explicitly so repeated verification is stable.
+
+[Current command/build outcomes](varied-data-validation.json) distinguish this
+revision from the earlier records above. A new cold empty-volume reset and full
+lifecycle matrix were not repeated for this revision: live upgrade, reuse,
+queries, and rendering were tested while preserving the previous demo data.
+The earlier lifecycle checks remain recorded above. Other architectures, builds,
+and production operation remain outside the tested scope.
