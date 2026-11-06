@@ -51,7 +51,7 @@ def load_config(create=False):
         with os.fdopen(fd, 'w') as stream:
             stream.write('# Local development credentials. Never commit this file.\n')
             stream.writelines(f'{key}={value}\n' for key, value in generated.items())
-        log('prepare', 'Generated private .env (credentials are not printed)')
+        log('prepare', 'Generated private .env')
     if envfile.exists():
         for line in envfile.read_text().splitlines():
             line = line.strip()
@@ -405,6 +405,27 @@ def cleanup(cfg, reset=False, yes=False):
     log('reset' if reset else 'down', 'Owned containers removed' + (' and owned persistent volumes deleted' if reset else '; persistent data preserved'))
 
 
+def present_kibana_access(cfg, open_browser=True):
+    """Show local login details and open the dashboard only in an interactive terminal."""
+    import dashboard
+    url = cfg['KIBANA_URL'].rstrip('/') + '/app/dashboards#/view/' + dashboard.ID
+    print(f'[access] Dashboard: {url}', flush=True)
+    if not (sys.stdin.isatty() and sys.stdout.isatty()):
+        print('[access] Credentials remain in private .env; browser opening is skipped outside an interactive terminal.', flush=True)
+        return
+    print(f"[access] Username: {cfg['ES_USERNAME']}")
+    print(f"[access] Password: {cfg['ES_PASSWORD']}", flush=True)
+    if not open_browser:
+        return
+    try:
+        import webbrowser
+        opened = webbrowser.open(url, new=2)
+    except Exception:
+        opened = False
+    if not opened:
+        print('[access] Open the dashboard URL manually.', flush=True)
+
+
 def main():
     parser = argparse.ArgumentParser(prog='./demo.sh', description=__doc__, epilog='Examples: ./demo.sh; ./demo.sh setup; ./demo.sh run; ./demo.sh setup --skip-stack-start --skip-s3-start --skip-data-upload --skip-registration; ./demo.sh reset --yes')
     parser.add_argument('command', nargs='?', default='all', choices=['all', 'setup', 'run', 'status', 'down', 'reset', 'help'], help='default/all: setup then run; setup: prepare and start; run: query and validate; status: check readiness and data; down: stop, preserving volumes; reset: delete owned volumes; help: show usage')
@@ -417,6 +438,7 @@ def main():
         ('dashboard', 'Reuse the compatible dashboard; check its definition'),
     ]:
         parser.add_argument('--skip-' + flag, action='store_true', help=description + ' (default/setup only)')
+    parser.add_argument('--no-open', action='store_true', help='Disable automatic browser opening (default/setup only)')
     parser.add_argument('--yes', action='store_true', help='Confirm deletion of owned persistent data (reset only)')
     args = parser.parse_args()
     if args.command == 'help':
@@ -424,6 +446,8 @@ def main():
         return
     if args.command not in ('all', 'setup') and any(getattr(args, 'skip_' + flag) for flag in ('stack_start', 's3_start', 'data_upload', 'registration', 'indexed_data', 'dashboard')):
         parser.error('Skip options apply only to the default command and setup.')
+    if args.no_open and args.command not in ('all', 'setup'):
+        parser.error('--no-open applies only to the default command and setup.')
     if args.yes and args.command != 'reset':
         parser.error('--yes applies only to reset.')
     cfg = load_config(create=args.command in ('all', 'setup'))
@@ -436,6 +460,8 @@ def main():
             status(cfg)
         elif args.command in ('down', 'reset'):
             cleanup(cfg, reset=args.command == 'reset', yes=args.yes)
+        if args.command in ('all', 'setup'):
+            present_kibana_access(cfg, open_browser=not args.no_open)
     except Exception as exc:
         fail(scrub(cfg, str(exc)))
 

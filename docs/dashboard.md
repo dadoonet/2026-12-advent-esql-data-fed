@@ -5,7 +5,7 @@ The dashboard compares two different sources of synthetic data:
 - **2025 history:** 360 delivery records in the external `santa_deliveries_2025` dataset, read from Parquet in MinIO through Data Federation.
 - **2026 plan:** 18 route-plan documents in the Elasticsearch lookup index `santa_delivery_plan_2026`. This is new synthetic planning data, not an indexed copy of the archive.
 
-Setup creates or verifies the dashboard. Open the URL printed by `./demo.sh setup`, defaulting to [Santa's Archives: Past Delays, Future Plans](http://localhost:5601/app/dashboards#/view/santa-esql-past-and-plan). Sign in using the private `.env` credentials.
+Setup creates or verifies the dashboard. Open the URL printed by `./demo.sh setup`, defaulting to [Santa's Archives: Past Delays, Future Plans](http://localhost:5601/app/dashboards#/view/santa-esql-past-and-plan). After a successful default/setup command in an interactive terminal, the script displays the configured username and password from private `.env` or environment overrides, then opens the dashboard in the default browser. Use `--no-open` to prevent browser opening. Noninteractive execution prints the URL without credentials and does not launch a browser.
 
 ## Panels and query families
 

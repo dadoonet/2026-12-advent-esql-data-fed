@@ -39,7 +39,7 @@ The default command performs `setup`, then `run`. It:
 7. Creates or verifies the native Kibana dashboard, using the Dashboards API.
 8. Runs five queries and compares every result with expectations derived independently from the generators’ source records.
 
-Open the [Santa dashboard](http://localhost:5601/app/dashboards#/view/santa-esql-past-and-plan) and sign in as `elastic` using `ES_PASSWORD` from your private `.env`. The setup output prints the URL for custom endpoints. Keep that file private. No credentials are printed by the orchestrator. [queries/dev-tools.http](queries/dev-tools.http) contains copy-paste requests for Kibana Dev Tools. [docs/walkthrough.md](docs/walkthrough.md) provides a short live-demo script. [Dashboard details](docs/dashboard.md) explain the indexed, external, and joined panels.
+Open the [Santa dashboard](http://localhost:5601/app/dashboards#/view/santa-esql-past-and-plan) and sign in as `elastic` using `ES_PASSWORD` from your private `.env`. After successful default/setup execution in an interactive terminal, the script prints the configured dashboard URL, username, and password, then opens the dashboard in the default browser. Keep `.env` private and avoid sharing terminal output containing the password. Noninteractive execution prints only the URL; it does not expose credentials or open a browser. Use `--no-open` to keep displaying interactive login details without opening the browser. [queries/dev-tools.http](queries/dev-tools.http) contains copy-paste requests for Kibana Dev Tools. [docs/walkthrough.md](docs/walkthrough.md) provides a short live-demo script. [Dashboard details](docs/dashboard.md) explain the indexed, external, and joined panels.
 
 The supplied Santa/Elky illustration appears as a native image banner. Setup uploads and verifies the original PNG in Kibana and resolves its local file ID automatically. See [header-image provisioning](docs/dashboard.md#header-image) for the snapshot-specific internal Files API dependency.
 
@@ -62,12 +62,17 @@ The default command and `setup` accept these options:
 - `--skip-registration`: reuse compatible data-source and dataset definitions; both must already exist.
 - `--skip-indexed-data`: reuse the 2026 lookup index; its mapping, ownership, and all 18 documents must match.
 - `--skip-dashboard`: reuse the dashboard; its managed definition must match.
+- `--no-open`: disable automatic browser opening; interactive login details are still displayed.
 
 Skipped prerequisites are checked. Setup refuses to overwrite an incompatible existing object, federation definition, lookup index, or dashboard. Repeated setup reuses healthy services and compatible resources. Existing data-source credentials are redacted by Elasticsearch, so their values cannot be verified by GET; executing the queries verifies access.
 
 ```sh
 # Start and validate everything.
 ./demo.sh
+
+# Prepare with interactive login details, without opening a browser.
+./demo.sh --no-open
+./demo.sh setup --no-open
 
 # Reuse Elasticsearch and Kibana; prepare MinIO and federation resources.
 ./demo.sh --skip-stack-start

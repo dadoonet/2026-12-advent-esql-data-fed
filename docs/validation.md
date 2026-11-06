@@ -222,3 +222,20 @@ The committed template contains a runtime file-ID placeholder; no environment's
 actual file ID is committed. Image Files API compatibility must be retested for
 other Kibana builds. A new full reset/down cycle was not repeated for this visual
 change; the previous lifecycle results remain recorded above.
+
+## Interactive Kibana login and browser launch — 2026-11-06
+
+After a successful default or setup command, an interactive terminal now displays
+`ES_USERNAME`, `ES_PASSWORD`, and the configured dashboard URL, then requests
+opening that URL with the operating system's default browser. `--no-open`
+suppresses browser launch while preserving the interactive login display.
+Both stdin and stdout must be terminals. Redirected/noninteractive runs display
+the URL without exposing credentials or launching a browser.
+
+Synthetic credentials and mocked terminal/browser streams verified interactive
+and noninteractive combinations, custom URL/space handling, `--no-open`, nonfatal
+browser-launch failures, and success-only ordering after setup/query validation.
+A live reused-service setup passed with redirected output; the actual password
+was asserted absent without being printed. Invalid `--no-open` usage with run,
+status, down, and reset was rejected before any side effects. No real terminal
+password output or actual default-browser launch was exercised in these tests.
