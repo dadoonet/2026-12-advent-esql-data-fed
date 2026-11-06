@@ -1,5 +1,7 @@
 # Santa's S3 Archives with ES|QL
 
+![Santa Elky and the Ghost of Christmas Past](assets/santa-elky-christmas-past.png)
+
 A runnable companion demo for **“The Ghost of Christmas Past: Querying Santa’s S3 Archives with ES|QL”**.
 
 Santa is preparing the 2026 delivery run. The Ghost of Christmas Past asks him to investigate Christmas 2025 delays. The archive is a small Parquet object in local MinIO. Elasticsearch queries that object through **ES|QL Data Federation**, without ingesting the historical records into an index. A separate synthetic 2026 plan lives in Elasticsearch. A native Kibana dashboard shows queries against each source, plus a real ES|QL join between them.
@@ -174,6 +176,10 @@ The original three queries above read only the 2025 archive. Two additional quer
 The plan has one document per category/country/carrier combination, with 18 distinct delivery volumes ranging from 65 to 290 and route-specific target late rates from 6% to 12%. Polar Parcel in France plans 290 toy-train deliveries against an 8% target. Applying its historical `44 / 57` late rate gives approximately **223.9 illustrative late deliveries**. Its historical rate exceeds the target by **69.2 percentage points**. This is a deliberately unchanged-rate scenario, not a forecast.
 
 [data/plan.py](data/plan.py) deterministically generates the plan and its independent expected results from the source records. The dashboard contains six native panels: the Santa/Elky image banner, two explanatory Markdown panels, one bar chart per source, and one mixed-source table. Both charts identify toy trains in Santa red, books in orange, and plush toys in green. Only the table’s gap-to-target column is conditionally colored; its legend explains the separate risk thresholds. See [docs/dashboard.md](docs/dashboard.md) for the full join and API lifecycle.
+
+![Kibana dashboard with Elasticsearch, S3, and joined data](assets/full-dashboard.png)
+
+*Illustrative dashboard capture; refer to the expected results above for the current generated values.*
 
 ## Updating an existing demo
 
