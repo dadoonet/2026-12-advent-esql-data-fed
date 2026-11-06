@@ -1,4 +1,4 @@
-FROM santa_delivery_plan_2026
+FROM santa_delivery_plan_2026_v2
 | STATS planned_deliveries = SUM(planned_deliveries) BY gift_category
 | SORT planned_deliveries DESC, gift_category ASC
 | LIMIT 10

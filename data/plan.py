@@ -9,17 +9,28 @@ from generate import source_rows
 
 
 OUTPUT = Path(__file__).resolve().parent
+# Values follow country/carrier loop order and intentionally vary across routes.
+PLANNED_COUNTS = {
+    "toy_train": (155, 290, 185, 225, 130, 175),
+    "books": (80, 135, 115, 75, 65, 90),
+    "plush": (125, 180, 105, 95, 150, 110),
+}
+TARGET_RATES = {
+    "toy_train": (10, 8, 12, 11, 9, 12),
+    "books": (8, 9, 7, 10, 6, 9),
+    "plush": (9, 11, 10, 7, 8, 12),
+}
 
 
 def plan_documents():
     """Return one stable, uniquely identified plan per category and route."""
     documents = []
     for category in ("toy_train", "books", "plush"):
-        for country in ("France", "Germany", "Spain"):
-            for carrier in ("Reindeer Express", "Polar Parcel"):
-                planned = 240 if (category, country, carrier) == (
-                    "toy_train", "France", "Polar Parcel"
-                ) else 100
+        for country_index, country in enumerate(("France", "Germany", "Spain")):
+            for carrier_index, carrier in enumerate(("Reindeer Express", "Polar Parcel")):
+                route = country_index * 2 + carrier_index
+                planned = PLANNED_COUNTS[category][route]
+                target = float(TARGET_RATES[category][route])
                 identifier = f"{category}-{country}-{carrier}".lower().replace("_", "-").replace(" ", "-")
                 documents.append({
                     "_id": identifier,
@@ -28,7 +39,7 @@ def plan_documents():
                         "country": country,
                         "carrier": carrier,
                         "planned_deliveries": planned,
-                        "target_late_rate": 10.0,
+                        "target_late_rate": target,
                     },
                 })
     return documents
@@ -62,6 +73,7 @@ def expected_results(documents, historical_rows):
             "historical_late_rate": 100.0 * late / total,
             "planned_deliveries": plan["planned_deliveries"],
             "target_late_rate": plan["target_late_rate"],
+            "late_rate_gap": 100.0 * late / total - plan["target_late_rate"],
             "illustrative_late_deliveries": 1.0 * plan["planned_deliveries"] * late / total,
         })
     joined.sort(key=lambda row: (-row["historical_late_rate"], row["carrier"], row["country"]))

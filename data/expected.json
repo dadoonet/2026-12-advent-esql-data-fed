@@ -6,8 +6,8 @@
       "gift_category": "toy_train",
       "carrier": "Reindeer Express",
       "promised_at": "2025-12-25T00:01:00Z",
-      "delivered_at": "2025-12-24T23:45:00Z",
-      "delay_minutes": -16
+      "delivered_at": "2025-12-24T23:54:00Z",
+      "delay_minutes": -7
     },
     {
       "delivery_id": "delivery-0002",
@@ -15,8 +15,8 @@
       "gift_category": "toy_train",
       "carrier": "Reindeer Express",
       "promised_at": "2025-12-25T00:02:00Z",
-      "delivered_at": "2025-12-24T23:41:00Z",
-      "delay_minutes": -21
+      "delivered_at": "2025-12-24T23:58:00Z",
+      "delay_minutes": -4
     },
     {
       "delivery_id": "delivery-0003",
@@ -24,8 +24,8 @@
       "gift_category": "toy_train",
       "carrier": "Reindeer Express",
       "promised_at": "2025-12-25T00:03:00Z",
-      "delivered_at": "2025-12-24T23:54:00Z",
-      "delay_minutes": -9
+      "delivered_at": "2025-12-24T23:49:00Z",
+      "delay_minutes": -14
     },
     {
       "delivery_id": "delivery-0004",
@@ -33,8 +33,8 @@
       "gift_category": "toy_train",
       "carrier": "Reindeer Express",
       "promised_at": "2025-12-25T00:04:00Z",
-      "delivered_at": "2025-12-24T23:39:00Z",
-      "delay_minutes": -25
+      "delivered_at": "2025-12-24T23:42:00Z",
+      "delay_minutes": -22
     },
     {
       "delivery_id": "delivery-0005",
@@ -42,72 +42,72 @@
       "gift_category": "toy_train",
       "carrier": "Reindeer Express",
       "promised_at": "2025-12-25T00:05:00Z",
-      "delivered_at": "2025-12-24T23:42:00Z",
-      "delay_minutes": -23
+      "delivered_at": "2025-12-24T23:37:00Z",
+      "delay_minutes": -28
     }
   ],
   "02-categories": [
     {
       "gift_category": "toy_train",
-      "total": 120,
-      "late": 26,
-      "late_rate": 21.666666666666668
-    },
-    {
-      "gift_category": "books",
-      "total": 120,
-      "late": 12,
-      "late_rate": 10.0
+      "total": 261,
+      "late": 68,
+      "late_rate": 26.053639846743295
     },
     {
       "gift_category": "plush",
-      "total": 120,
-      "late": 12,
-      "late_rate": 10.0
+      "total": 253,
+      "late": 18,
+      "late_rate": 7.1146245059288535
+    },
+    {
+      "gift_category": "books",
+      "total": 258,
+      "late": 16,
+      "late_rate": 6.2015503875969
     }
   ],
   "03-investigate": [
     {
       "carrier": "Polar Parcel",
       "country": "France",
-      "total": 20,
-      "late": 16,
-      "late_rate": 80.0
+      "total": 57,
+      "late": 44,
+      "late_rate": 77.19298245614036
     },
     {
       "carrier": "Polar Parcel",
       "country": "Germany",
-      "total": 20,
-      "late": 2,
-      "late_rate": 10.0
+      "total": 49,
+      "late": 9,
+      "late_rate": 18.367346938775512
     },
     {
       "carrier": "Polar Parcel",
       "country": "Spain",
-      "total": 20,
-      "late": 2,
-      "late_rate": 10.0
+      "total": 45,
+      "late": 6,
+      "late_rate": 13.333333333333334
+    },
+    {
+      "carrier": "Reindeer Express",
+      "country": "Germany",
+      "total": 36,
+      "late": 4,
+      "late_rate": 11.11111111111111
     },
     {
       "carrier": "Reindeer Express",
       "country": "France",
-      "total": 20,
-      "late": 2,
-      "late_rate": 10.0
-    },
-    {
-      "carrier": "Reindeer Express",
-      "country": "Germany",
-      "total": 20,
-      "late": 2,
-      "late_rate": 10.0
+      "total": 43,
+      "late": 3,
+      "late_rate": 6.976744186046512
     },
     {
       "carrier": "Reindeer Express",
       "country": "Spain",
-      "total": 20,
+      "total": 31,
       "late": 2,
-      "late_rate": 10.0
+      "late_rate": 6.451612903225806
     }
   ]
 }

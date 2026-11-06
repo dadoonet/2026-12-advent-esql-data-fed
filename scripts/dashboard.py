@@ -11,6 +11,7 @@ ID = 'santa-esql-past-and-plan'
 PATH = '/api/dashboards/' + ID
 MARKER = 'Managed by santa-esql-advent: past-and-plan-v1.'
 DEFINITION = ROOT / 'dashboards/santa-archives.json'
+PREVIOUS_DEFINITION = ROOT / 'dashboards/previous/santa-archives-v1.json'
 # Only these exact observed API defaults may be added to the requested payload.
 API_DEFAULTS = json.loads((ROOT / 'dashboards/api-defaults.json').read_text())
 
@@ -72,14 +73,16 @@ def ensure(cfg, request, create=False):
             if source.get('type') == 'file':
                 preferred_id = source.get('file_id')
         current_matches = preferred_id and _matches(_with_image_id(template, preferred_id), actual)
-        previous_layout = _matches(_previous_definition(template), actual)
+        previous = json.loads(PREVIOUS_DEFINITION.read_text())
+        previous_layout = (_matches(_with_image_id(previous, preferred_id), actual) if preferred_id
+                           else _matches(_previous_definition(previous), actual))
         if not current_matches and not previous_layout:
             raise RuntimeError(
                 'Existing demo dashboard is incompatible; refusing to overwrite it. '
                 'Restore the managed definition or explicitly remove the demo-owned dashboard in Kibana.'
             )
         if previous_layout and not create:
-            raise RuntimeError('Dashboard needs the header-image upgrade. Run ./demo.sh setup without --skip-dashboard.')
+            raise RuntimeError('Dashboard needs the dataset and color upgrade. Run ./demo.sh setup without --skip-dashboard.')
     file_id = dashboard_image.ensure(cfg, request, create=create, preferred_id=preferred_id)
     desired = _with_image_id(template, file_id)
     if existing is None or not _matches(desired, existing.get('data', {})):

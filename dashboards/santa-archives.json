@@ -48,10 +48,10 @@
         "title": "[Elasticsearch] 2026 planned deliveries",
         "layers": [
           {
-            "type": "bar",
+            "type": "bar_stacked",
             "data_source": {
               "type": "esql",
-              "query": "FROM santa_delivery_plan_2026\n| STATS planned_deliveries = SUM(planned_deliveries) BY gift_category\n| SORT planned_deliveries DESC, gift_category ASC\n| LIMIT 10\n"
+              "query": "FROM santa_delivery_plan_2026_v2\n| STATS planned_deliveries = SUM(planned_deliveries) BY gift_category\n| SORT planned_deliveries DESC, gift_category ASC\n| LIMIT 10\n"
             },
             "x": {
               "column": "gift_category"
@@ -60,7 +60,47 @@
               {
                 "column": "planned_deliveries"
               }
-            ]
+            ],
+            "breakdown_by": {
+              "column": "gift_category",
+              "color": {
+                "mode": "categorical",
+                "palette": "default",
+                "mapping": [
+                  {
+                    "values": [
+                      "toy_train"
+                    ],
+                    "color": {
+                      "type": "color_code",
+                      "value": "#D92D35"
+                    }
+                  },
+                  {
+                    "values": [
+                      "books"
+                    ],
+                    "color": {
+                      "type": "color_code",
+                      "value": "#F59E0B"
+                    }
+                  },
+                  {
+                    "values": [
+                      "plush"
+                    ],
+                    "color": {
+                      "type": "color_code",
+                      "value": "#2E7D50"
+                    }
+                  }
+                ],
+                "unassigned": {
+                  "type": "color_code",
+                  "value": "#64748B"
+                }
+              }
+            }
           }
         ]
       }
@@ -78,7 +118,7 @@
         "title": "[S3] 2025 late-delivery rate (%)",
         "layers": [
           {
-            "type": "bar",
+            "type": "bar_stacked",
             "data_source": {
               "type": "esql",
               "query": "FROM santa_deliveries_2025\n| STATS total = COUNT(*), late = COUNT(*) WHERE delay_minutes > 0 BY gift_category\n| EVAL late_rate = 100.0 * late / total\n| SORT late_rate DESC, gift_category ASC\n| LIMIT 10\n"
@@ -88,9 +128,55 @@
             },
             "y": [
               {
-                "column": "late_rate"
+                "column": "late_rate",
+                "format": {
+                  "type": "number",
+                  "decimals": 1,
+                  "suffix": "%",
+                  "compact": false
+                }
               }
-            ]
+            ],
+            "breakdown_by": {
+              "column": "gift_category",
+              "color": {
+                "mode": "categorical",
+                "palette": "default",
+                "mapping": [
+                  {
+                    "values": [
+                      "toy_train"
+                    ],
+                    "color": {
+                      "type": "color_code",
+                      "value": "#D92D35"
+                    }
+                  },
+                  {
+                    "values": [
+                      "books"
+                    ],
+                    "color": {
+                      "type": "color_code",
+                      "value": "#F59E0B"
+                    }
+                  },
+                  {
+                    "values": [
+                      "plush"
+                    ],
+                    "color": {
+                      "type": "color_code",
+                      "value": "#2E7D50"
+                    }
+                  }
+                ],
+                "unassigned": {
+                  "type": "color_code",
+                  "value": "#64748B"
+                }
+              }
+            }
           }
         ]
       }
@@ -108,7 +194,7 @@
         "title": "[S3 + Elasticsearch] Toy-train exposure in 2026",
         "data_source": {
           "type": "esql",
-          "query": "FROM santa_deliveries_2025\n| WHERE gift_category == \"toy_train\"\n| STATS historical_total = COUNT(*), historical_late = COUNT(*) WHERE delay_minutes > 0 BY gift_category, carrier, country\n| LOOKUP JOIN santa_delivery_plan_2026 ON gift_category, carrier, country\n| EVAL historical_late_rate = 100.0 * historical_late / historical_total, illustrative_late_deliveries = 1.0 * planned_deliveries * historical_late / historical_total\n| KEEP carrier, country, historical_total, historical_late, historical_late_rate, planned_deliveries, target_late_rate, illustrative_late_deliveries\n| SORT historical_late_rate DESC, carrier ASC, country ASC\n| LIMIT 10\n"
+          "query": "FROM santa_deliveries_2025\n| WHERE gift_category == \"toy_train\"\n| STATS historical_total = COUNT(*), historical_late = COUNT(*) WHERE delay_minutes > 0 BY gift_category, carrier, country\n| LOOKUP JOIN santa_delivery_plan_2026_v2 ON gift_category, carrier, country\n| EVAL historical_late_rate = 100.0 * historical_late / historical_total, illustrative_late_deliveries = 1.0 * planned_deliveries * historical_late / historical_total\n| EVAL late_rate_gap = historical_late_rate - target_late_rate\n| KEEP carrier, country, historical_total, historical_late, historical_late_rate, planned_deliveries, target_late_rate, late_rate_gap, illustrative_late_deliveries\n| SORT historical_late_rate DESC, carrier ASC, country ASC\n| LIMIT 10\n"
         },
         "rows": [
           {
@@ -123,27 +209,89 @@
         "metrics": [
           {
             "column": "historical_total",
-            "label": "2025 deliveries"
+            "label": "2025 total",
+            "format": {
+              "type": "number",
+              "decimals": 0,
+              "compact": false
+            }
           },
           {
             "column": "historical_late",
-            "label": "2025 late deliveries"
+            "label": "2025 late",
+            "format": {
+              "type": "number",
+              "decimals": 0,
+              "compact": false
+            }
           },
           {
             "column": "historical_late_rate",
-            "label": "2025 late rate (%)"
+            "label": "2025 late (%)",
+            "format": {
+              "type": "number",
+              "decimals": 1,
+              "suffix": "%",
+              "compact": false
+            }
           },
           {
             "column": "planned_deliveries",
-            "label": "2026 planned deliveries"
+            "label": "2026 planned",
+            "format": {
+              "type": "number",
+              "decimals": 0,
+              "compact": false
+            }
           },
           {
             "column": "target_late_rate",
-            "label": "2026 target late rate (%)"
+            "label": "Target (%)",
+            "format": {
+              "type": "number",
+              "decimals": 1,
+              "suffix": "%",
+              "compact": false
+            }
+          },
+          {
+            "column": "late_rate_gap",
+            "label": "Gap to target (pp)",
+            "format": {
+              "type": "number",
+              "decimals": 1,
+              "suffix": " pp",
+              "compact": false
+            },
+            "apply_color_to": "background",
+            "color": {
+              "type": "dynamic",
+              "range": "absolute",
+              "steps": [
+                {
+                  "lt": -2,
+                  "color": "#2E7D50"
+                },
+                {
+                  "gte": -2,
+                  "lt": 5,
+                  "color": "#F59E0B"
+                },
+                {
+                  "gte": 5,
+                  "color": "#D92D35"
+                }
+              ]
+            }
           },
           {
             "column": "illustrative_late_deliveries",
-            "label": "Illustrative late deliveries"
+            "label": "Illustrative late",
+            "format": {
+              "type": "number",
+              "decimals": 1,
+              "compact": false
+            }
           }
         ]
       }
@@ -154,10 +302,10 @@
         "x": 0,
         "y": 46,
         "w": 48,
-        "h": 4
+        "h": 6
       },
       "config": {
-        "content": "**Interpretation:** `illustrative_late_deliveries = planned_deliveries * historical_late / historical_total`. This applies the 2025 rate to the 2026 plan as an **illustrative unchanged-rate scenario, not a forecast**.\n\nThe 2025 archive remains external; only the 2026 plan is indexed. Data Federation is experimental, and this MinIO compatibility experiment is not officially supported by Elastic."
+        "content": "**Interpretation:** `illustrative_late_deliveries = planned_deliveries * historical_late / historical_total`. This applies the 2025 rate to the 2026 plan as an **illustrative unchanged-rate scenario, not a forecast**.\n\nThe 2025 archive remains external; only the 2026 plan is indexed. Data Federation is experimental, and this MinIO compatibility experiment is not officially supported by Elastic.\n\n**Gap colors:** green below \u22122 pp; orange from \u22122 to below +5 pp; red at +5 pp or above. Gap = historical late rate \u2212 route target. Chart colors identify gift categories; table colors indicate the gap to target."
       }
     }
   ],

@@ -5,7 +5,7 @@
       "gift_category": "toy_train",
       "country": "France",
       "carrier": "Reindeer Express",
-      "planned_deliveries": 100,
+      "planned_deliveries": 155,
       "target_late_rate": 10.0
     }
   },
@@ -15,8 +15,8 @@
       "gift_category": "toy_train",
       "country": "France",
       "carrier": "Polar Parcel",
-      "planned_deliveries": 240,
-      "target_late_rate": 10.0
+      "planned_deliveries": 290,
+      "target_late_rate": 8.0
     }
   },
   {
@@ -25,8 +25,8 @@
       "gift_category": "toy_train",
       "country": "Germany",
       "carrier": "Reindeer Express",
-      "planned_deliveries": 100,
-      "target_late_rate": 10.0
+      "planned_deliveries": 185,
+      "target_late_rate": 12.0
     }
   },
   {
@@ -35,8 +35,8 @@
       "gift_category": "toy_train",
       "country": "Germany",
       "carrier": "Polar Parcel",
-      "planned_deliveries": 100,
-      "target_late_rate": 10.0
+      "planned_deliveries": 225,
+      "target_late_rate": 11.0
     }
   },
   {
@@ -45,8 +45,8 @@
       "gift_category": "toy_train",
       "country": "Spain",
       "carrier": "Reindeer Express",
-      "planned_deliveries": 100,
-      "target_late_rate": 10.0
+      "planned_deliveries": 130,
+      "target_late_rate": 9.0
     }
   },
   {
@@ -55,8 +55,8 @@
       "gift_category": "toy_train",
       "country": "Spain",
       "carrier": "Polar Parcel",
-      "planned_deliveries": 100,
-      "target_late_rate": 10.0
+      "planned_deliveries": 175,
+      "target_late_rate": 12.0
     }
   },
   {
@@ -65,8 +65,8 @@
       "gift_category": "books",
       "country": "France",
       "carrier": "Reindeer Express",
-      "planned_deliveries": 100,
-      "target_late_rate": 10.0
+      "planned_deliveries": 80,
+      "target_late_rate": 8.0
     }
   },
   {
@@ -75,8 +75,8 @@
       "gift_category": "books",
       "country": "France",
       "carrier": "Polar Parcel",
-      "planned_deliveries": 100,
-      "target_late_rate": 10.0
+      "planned_deliveries": 135,
+      "target_late_rate": 9.0
     }
   },
   {
@@ -85,8 +85,8 @@
       "gift_category": "books",
       "country": "Germany",
       "carrier": "Reindeer Express",
-      "planned_deliveries": 100,
-      "target_late_rate": 10.0
+      "planned_deliveries": 115,
+      "target_late_rate": 7.0
     }
   },
   {
@@ -95,7 +95,7 @@
       "gift_category": "books",
       "country": "Germany",
       "carrier": "Polar Parcel",
-      "planned_deliveries": 100,
+      "planned_deliveries": 75,
       "target_late_rate": 10.0
     }
   },
@@ -105,8 +105,8 @@
       "gift_category": "books",
       "country": "Spain",
       "carrier": "Reindeer Express",
-      "planned_deliveries": 100,
-      "target_late_rate": 10.0
+      "planned_deliveries": 65,
+      "target_late_rate": 6.0
     }
   },
   {
@@ -115,8 +115,8 @@
       "gift_category": "books",
       "country": "Spain",
       "carrier": "Polar Parcel",
-      "planned_deliveries": 100,
-      "target_late_rate": 10.0
+      "planned_deliveries": 90,
+      "target_late_rate": 9.0
     }
   },
   {
@@ -125,8 +125,8 @@
       "gift_category": "plush",
       "country": "France",
       "carrier": "Reindeer Express",
-      "planned_deliveries": 100,
-      "target_late_rate": 10.0
+      "planned_deliveries": 125,
+      "target_late_rate": 9.0
     }
   },
   {
@@ -135,8 +135,8 @@
       "gift_category": "plush",
       "country": "France",
       "carrier": "Polar Parcel",
-      "planned_deliveries": 100,
-      "target_late_rate": 10.0
+      "planned_deliveries": 180,
+      "target_late_rate": 11.0
     }
   },
   {
@@ -145,7 +145,7 @@
       "gift_category": "plush",
       "country": "Germany",
       "carrier": "Reindeer Express",
-      "planned_deliveries": 100,
+      "planned_deliveries": 105,
       "target_late_rate": 10.0
     }
   },
@@ -155,8 +155,8 @@
       "gift_category": "plush",
       "country": "Germany",
       "carrier": "Polar Parcel",
-      "planned_deliveries": 100,
-      "target_late_rate": 10.0
+      "planned_deliveries": 95,
+      "target_late_rate": 7.0
     }
   },
   {
@@ -165,8 +165,8 @@
       "gift_category": "plush",
       "country": "Spain",
       "carrier": "Reindeer Express",
-      "planned_deliveries": 100,
-      "target_late_rate": 10.0
+      "planned_deliveries": 150,
+      "target_late_rate": 8.0
     }
   },
   {
@@ -175,8 +175,8 @@
       "gift_category": "plush",
       "country": "Spain",
       "carrier": "Polar Parcel",
-      "planned_deliveries": 100,
-      "target_late_rate": 10.0
+      "planned_deliveries": 110,
+      "target_late_rate": 12.0
     }
   }
 ]

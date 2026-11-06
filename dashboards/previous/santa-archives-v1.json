@@ -1,0 +1,166 @@
+{
+  "title": "Santa's Archives: Past Delays, Future Plans",
+  "description": "Managed by santa-esql-advent: past-and-plan-v1. Compare external Christmas 2025 archives with the indexed 2026 delivery plan.",
+  "panels": [
+    {
+      "type": "image",
+      "grid": {
+        "x": 0,
+        "y": 0,
+        "w": 48,
+        "h": 16
+      },
+      "config": {
+        "hide_title": true,
+        "hide_border": true,
+        "image_config": {
+          "alt_text": "Elky dressed as Santa meeting the Ghost of Christmas Past with a toy train.",
+          "object_fit": "contain",
+          "src": {
+            "type": "file",
+            "file_id": "__SANTA_HEADER_IMAGE_FILE_ID__"
+          }
+        }
+      }
+    },
+    {
+      "type": "markdown",
+      "grid": {
+        "x": 0,
+        "y": 16,
+        "w": 48,
+        "h": 5
+      },
+      "config": {
+        "content": "## The Ghost of Christmas Past\nSanta is preparing the 2026 delivery run. Compare the **2026 plan in Elasticsearch** with **2025 deliveries read directly from Parquet in MinIO**, then join both sources to inspect toy-train exposure.\n\nA delivery is late when `delay_minutes > 0`."
+      }
+    },
+    {
+      "type": "vis",
+      "grid": {
+        "x": 0,
+        "y": 21,
+        "w": 24,
+        "h": 12
+      },
+      "config": {
+        "type": "xy",
+        "title": "[Elasticsearch] 2026 planned deliveries",
+        "layers": [
+          {
+            "type": "bar",
+            "data_source": {
+              "type": "esql",
+              "query": "FROM santa_delivery_plan_2026\n| STATS planned_deliveries = SUM(planned_deliveries) BY gift_category\n| SORT planned_deliveries DESC, gift_category ASC\n| LIMIT 10\n"
+            },
+            "x": {
+              "column": "gift_category"
+            },
+            "y": [
+              {
+                "column": "planned_deliveries"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "type": "vis",
+      "grid": {
+        "x": 24,
+        "y": 21,
+        "w": 24,
+        "h": 12
+      },
+      "config": {
+        "type": "xy",
+        "title": "[S3] 2025 late-delivery rate (%)",
+        "layers": [
+          {
+            "type": "bar",
+            "data_source": {
+              "type": "esql",
+              "query": "FROM santa_deliveries_2025\n| STATS total = COUNT(*), late = COUNT(*) WHERE delay_minutes > 0 BY gift_category\n| EVAL late_rate = 100.0 * late / total\n| SORT late_rate DESC, gift_category ASC\n| LIMIT 10\n"
+            },
+            "x": {
+              "column": "gift_category"
+            },
+            "y": [
+              {
+                "column": "late_rate"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "type": "vis",
+      "grid": {
+        "x": 0,
+        "y": 33,
+        "w": 48,
+        "h": 13
+      },
+      "config": {
+        "type": "data_table",
+        "title": "[S3 + Elasticsearch] Toy-train exposure in 2026",
+        "data_source": {
+          "type": "esql",
+          "query": "FROM santa_deliveries_2025\n| WHERE gift_category == \"toy_train\"\n| STATS historical_total = COUNT(*), historical_late = COUNT(*) WHERE delay_minutes > 0 BY gift_category, carrier, country\n| LOOKUP JOIN santa_delivery_plan_2026 ON gift_category, carrier, country\n| EVAL historical_late_rate = 100.0 * historical_late / historical_total, illustrative_late_deliveries = 1.0 * planned_deliveries * historical_late / historical_total\n| KEEP carrier, country, historical_total, historical_late, historical_late_rate, planned_deliveries, target_late_rate, illustrative_late_deliveries\n| SORT historical_late_rate DESC, carrier ASC, country ASC\n| LIMIT 10\n"
+        },
+        "rows": [
+          {
+            "column": "carrier",
+            "label": "Carrier"
+          },
+          {
+            "column": "country",
+            "label": "Country"
+          }
+        ],
+        "metrics": [
+          {
+            "column": "historical_total",
+            "label": "2025 deliveries"
+          },
+          {
+            "column": "historical_late",
+            "label": "2025 late deliveries"
+          },
+          {
+            "column": "historical_late_rate",
+            "label": "2025 late rate (%)"
+          },
+          {
+            "column": "planned_deliveries",
+            "label": "2026 planned deliveries"
+          },
+          {
+            "column": "target_late_rate",
+            "label": "2026 target late rate (%)"
+          },
+          {
+            "column": "illustrative_late_deliveries",
+            "label": "Illustrative late deliveries"
+          }
+        ]
+      }
+    },
+    {
+      "type": "markdown",
+      "grid": {
+        "x": 0,
+        "y": 46,
+        "w": 48,
+        "h": 4
+      },
+      "config": {
+        "content": "**Interpretation:** `illustrative_late_deliveries = planned_deliveries * historical_late / historical_total`. This applies the 2025 rate to the 2026 plan as an **illustrative unchanged-rate scenario, not a forecast**.\n\nThe 2025 archive remains external; only the 2026 plan is indexed. Data Federation is experimental, and this MinIO compatibility experiment is not officially supported by Elastic."
+      }
+    }
+  ],
+  "filters": [],
+  "pinned_panels": []
+}

@@ -12,6 +12,12 @@ import pyarrow.parquet as pq
 
 
 SEED = 20251225
+# Each category lists (deliveries, late deliveries) in country/carrier loop order.
+ROUTE_COUNTS = {
+    "toy_train": ((43, 3), (57, 44), (36, 4), (49, 9), (31, 2), (45, 6)),
+    "books": ((38, 2), (52, 4), (47, 3), (41, 2), (34, 1), (46, 4)),
+    "plush": ((39, 3), (53, 5), (44, 4), (32, 1), (48, 2), (37, 3)),
+}
 OUTPUT = Path(__file__).resolve().parent
 FIELDS = [
     "delivery_id", "country", "gift_category", "carrier", "promised_at",
@@ -20,17 +26,15 @@ FIELDS = [
 
 
 def source_rows():
-    """Return 360 flat records; positive signed delay means late."""
+    """Return 772 varied flat records; positive signed delay means late."""
     rng = random.Random(SEED)
     rows = []
     start = datetime(2025, 12, 25, tzinfo=timezone.utc)
     for category in ("toy_train", "books", "plush"):
-        for country in ("France", "Germany", "Spain"):
-            for carrier in ("Reindeer Express", "Polar Parcel"):
-                late_count = 16 if (category, country, carrier) == (
-                    "toy_train", "France", "Polar Parcel"
-                ) else 2
-                late_flags = [True] * late_count + [False] * (20 - late_count)
+        for country_index, country in enumerate(("France", "Germany", "Spain")):
+            for carrier_index, carrier in enumerate(("Reindeer Express", "Polar Parcel")):
+                total, late_count = ROUTE_COUNTS[category][country_index * 2 + carrier_index]
+                late_flags = [True] * late_count + [False] * (total - late_count)
                 rng.shuffle(late_flags)
                 for is_late in late_flags:
                     number = len(rows) + 1

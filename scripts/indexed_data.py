@@ -7,8 +7,8 @@ from urllib.parse import quote
 
 
 ROOT = Path(__file__).resolve().parents[1]
-INDEX = "santa_delivery_plan_2026"
-MARKER = {"santa_demo": "delivery-plan-v1"}
+INDEX = "santa_delivery_plan_2026_v2"
+MARKER = {"santa_demo": "delivery-plan-v2"}
 PROPERTIES = {
     "gift_category": {"type": "keyword"},
     "country": {"type": "keyword"},

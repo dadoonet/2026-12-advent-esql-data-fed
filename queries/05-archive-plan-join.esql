@@ -1,8 +1,9 @@
 FROM santa_deliveries_2025
 | WHERE gift_category == "toy_train"
 | STATS historical_total = COUNT(*), historical_late = COUNT(*) WHERE delay_minutes > 0 BY gift_category, carrier, country
-| LOOKUP JOIN santa_delivery_plan_2026 ON gift_category, carrier, country
+| LOOKUP JOIN santa_delivery_plan_2026_v2 ON gift_category, carrier, country
 | EVAL historical_late_rate = 100.0 * historical_late / historical_total, illustrative_late_deliveries = 1.0 * planned_deliveries * historical_late / historical_total
-| KEEP carrier, country, historical_total, historical_late, historical_late_rate, planned_deliveries, target_late_rate, illustrative_late_deliveries
+| EVAL late_rate_gap = historical_late_rate - target_late_rate
+| KEEP carrier, country, historical_total, historical_late, historical_late_rate, planned_deliveries, target_late_rate, late_rate_gap, illustrative_late_deliveries
 | SORT historical_late_rate DESC, carrier ASC, country ASC
 | LIMIT 10

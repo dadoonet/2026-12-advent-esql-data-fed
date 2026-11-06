@@ -21,7 +21,9 @@ OWNER = hashlib.sha256(str(ROOT).encode()).hexdigest()[:16]
 SOURCE = 'santa_minio'
 DATASET = 'santa_deliveries_2025'
 BUCKET = 'santa-archives'
-OBJECT = 'christmas-2025.parquet'
+OBJECT = 'christmas-2025-v2.parquet'
+LEGACY_OBJECT = 'christmas-2025.parquet'
+LEGACY_ARCHIVE_SHA256 = 'de6f9458d9149d68d997cd3c096682b06953c71685e93768df8b4a2d9e322cbc'
 DEFAULTS = {
     'ES_VERSION': '9.6.0-SNAPSHOT', 'KIBANA_VERSION': '9.6.0-SNAPSHOT',
     'ES_PORT': '9200', 'KIBANA_PORT': '5601', 'S3_PORT': '9000',
@@ -258,6 +260,25 @@ def definitions(cfg, create=False):
             log('register', f'Created {resource} {name}')
         else:
             current = existing[plural][0]
+            if resource == 'dataset' and current.get('resource') == f's3://{BUCKET}/{LEGACY_OBJECT}':
+                if not create:
+                    fail('Dataset uses the previous archive. Run ./demo.sh setup without --skip-registration to upgrade it.')
+                previous_settings = current.get('settings', {})
+                if (set(current) - {'name', 'data_source', 'resource', 'settings', 'description'}
+                        or current.get('data_source') != SOURCE or previous_settings.get('region') != cfg['S3_REGION']
+                        or set(previous_settings) - {'region', 'schema_resolution'}
+                        or previous_settings.get('schema_resolution', 'first_file_wins') != 'first_file_wins'):
+                    fail('Previous dataset definition was changed; refusing to overwrite it.')
+                # Keep the compatible existing schema-resolution choice when repointing the archive.
+                desired['settings'] = dict(previous_settings)
+                if 'description' in current:
+                    desired['description'] = current['description']
+                previous_bytes = s3_client(cfg).get_object(Bucket=BUCKET, Key=LEGACY_OBJECT)['Body'].read()
+                if hashlib.sha256(previous_bytes).hexdigest() != LEGACY_ARCHIVE_SHA256:
+                    fail('Previous archive was changed; refusing to repoint its dataset. Restore it or explicitly remove the demo-owned dataset before setup.')
+                log('register', 'Upgrading the verified dataset to the varied archive; the previous S3 object is preserved')
+                request(cfg, 'PUT', path, desired)
+                current = request(cfg, 'GET', path)[plural][0]
             for key, value in desired.items():
                 if key == 'settings':
                     for setting, wanted in value.items():

@@ -2,77 +2,83 @@
   "04-planned-volumes": [
     {
       "gift_category": "toy_train",
-      "planned_deliveries": 740
-    },
-    {
-      "gift_category": "books",
-      "planned_deliveries": 600
+      "planned_deliveries": 1160
     },
     {
       "gift_category": "plush",
-      "planned_deliveries": 600
+      "planned_deliveries": 765
+    },
+    {
+      "gift_category": "books",
+      "planned_deliveries": 560
     }
   ],
   "05-archive-plan-join": [
     {
       "carrier": "Polar Parcel",
       "country": "France",
-      "historical_total": 20,
-      "historical_late": 16,
-      "historical_late_rate": 80.0,
-      "planned_deliveries": 240,
-      "target_late_rate": 10.0,
-      "illustrative_late_deliveries": 192.0
+      "historical_total": 57,
+      "historical_late": 44,
+      "historical_late_rate": 77.19298245614036,
+      "planned_deliveries": 290,
+      "target_late_rate": 8.0,
+      "late_rate_gap": 69.19298245614036,
+      "illustrative_late_deliveries": 223.859649122807
     },
     {
       "carrier": "Polar Parcel",
       "country": "Germany",
-      "historical_total": 20,
-      "historical_late": 2,
-      "historical_late_rate": 10.0,
-      "planned_deliveries": 100,
-      "target_late_rate": 10.0,
-      "illustrative_late_deliveries": 10.0
+      "historical_total": 49,
+      "historical_late": 9,
+      "historical_late_rate": 18.367346938775512,
+      "planned_deliveries": 225,
+      "target_late_rate": 11.0,
+      "late_rate_gap": 7.367346938775512,
+      "illustrative_late_deliveries": 41.326530612244895
     },
     {
       "carrier": "Polar Parcel",
       "country": "Spain",
-      "historical_total": 20,
-      "historical_late": 2,
-      "historical_late_rate": 10.0,
-      "planned_deliveries": 100,
-      "target_late_rate": 10.0,
-      "illustrative_late_deliveries": 10.0
+      "historical_total": 45,
+      "historical_late": 6,
+      "historical_late_rate": 13.333333333333334,
+      "planned_deliveries": 175,
+      "target_late_rate": 12.0,
+      "late_rate_gap": 1.333333333333334,
+      "illustrative_late_deliveries": 23.333333333333332
+    },
+    {
+      "carrier": "Reindeer Express",
+      "country": "Germany",
+      "historical_total": 36,
+      "historical_late": 4,
+      "historical_late_rate": 11.11111111111111,
+      "planned_deliveries": 185,
+      "target_late_rate": 12.0,
+      "late_rate_gap": -0.8888888888888893,
+      "illustrative_late_deliveries": 20.555555555555557
     },
     {
       "carrier": "Reindeer Express",
       "country": "France",
-      "historical_total": 20,
-      "historical_late": 2,
-      "historical_late_rate": 10.0,
-      "planned_deliveries": 100,
+      "historical_total": 43,
+      "historical_late": 3,
+      "historical_late_rate": 6.976744186046512,
+      "planned_deliveries": 155,
       "target_late_rate": 10.0,
-      "illustrative_late_deliveries": 10.0
-    },
-    {
-      "carrier": "Reindeer Express",
-      "country": "Germany",
-      "historical_total": 20,
-      "historical_late": 2,
-      "historical_late_rate": 10.0,
-      "planned_deliveries": 100,
-      "target_late_rate": 10.0,
-      "illustrative_late_deliveries": 10.0
+      "late_rate_gap": -3.0232558139534884,
+      "illustrative_late_deliveries": 10.813953488372093
     },
     {
       "carrier": "Reindeer Express",
       "country": "Spain",
-      "historical_total": 20,
+      "historical_total": 31,
       "historical_late": 2,
-      "historical_late_rate": 10.0,
-      "planned_deliveries": 100,
-      "target_late_rate": 10.0,
-      "illustrative_late_deliveries": 10.0
+      "historical_late_rate": 6.451612903225806,
+      "planned_deliveries": 130,
+      "target_late_rate": 9.0,
+      "late_rate_gap": -2.548387096774194,
+      "illustrative_late_deliveries": 8.387096774193548
     }
   ]
 }
